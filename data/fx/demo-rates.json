@@ -1,0 +1,23 @@
+{
+  "base": "USD",
+  "quote": "NGN",
+  "rates": [
+    {
+      "date": "2026-09-01",
+      "rate": 1510
+    },
+    {
+      "date": "2026-09-05",
+      "rate": 1530
+    },
+    {
+      "date": "2026-09-10",
+      "rate": 1540
+    },
+    {
+      "date": "2026-09-15",
+      "rate": 1550
+    }
+  ],
+  "note": "Synthetic fixture data for Demo Mode. Not a market quote."
+}

@@ -1,0 +1,213 @@
+{
+  "scenario": {
+    "id": "fx-pressure",
+    "name": "FX Pressure",
+    "accountId": "999999468761"
+  },
+  "cost": {
+    "periodDays": 30,
+    "daily": [
+      {
+        "dateOffset": -29,
+        "amountUsd": 49.4
+      },
+      {
+        "dateOffset": -28,
+        "amountUsd": 52.52
+      },
+      {
+        "dateOffset": -27,
+        "amountUsd": 49.92
+      },
+      {
+        "dateOffset": -26,
+        "amountUsd": 53.04
+      },
+      {
+        "dateOffset": -25,
+        "amountUsd": 50.44
+      },
+      {
+        "dateOffset": -24,
+        "amountUsd": 53.56
+      },
+      {
+        "dateOffset": -23,
+        "amountUsd": 50.96
+      },
+      {
+        "dateOffset": -22,
+        "amountUsd": 54.08
+      },
+      {
+        "dateOffset": -21,
+        "amountUsd": 51.48
+      },
+      {
+        "dateOffset": -20,
+        "amountUsd": 54.6
+      },
+      {
+        "dateOffset": -19,
+        "amountUsd": 52.0
+      },
+      {
+        "dateOffset": -18,
+        "amountUsd": 49.4
+      },
+      {
+        "dateOffset": -17,
+        "amountUsd": 52.52
+      },
+      {
+        "dateOffset": -16,
+        "amountUsd": 49.92
+      },
+      {
+        "dateOffset": -15,
+        "amountUsd": 53.04
+      },
+      {
+        "dateOffset": -14,
+        "amountUsd": 50.44
+      },
+      {
+        "dateOffset": -13,
+        "amountUsd": 53.56
+      },
+      {
+        "dateOffset": -12,
+        "amountUsd": 50.96
+      },
+      {
+        "dateOffset": -11,
+        "amountUsd": 54.08
+      },
+      {
+        "dateOffset": -10,
+        "amountUsd": 51.48
+      },
+      {
+        "dateOffset": -9,
+        "amountUsd": 54.6
+      },
+      {
+        "dateOffset": -8,
+        "amountUsd": 52.0
+      },
+      {
+        "dateOffset": -7,
+        "amountUsd": 49.4
+      },
+      {
+        "dateOffset": -6,
+        "amountUsd": 52.52
+      },
+      {
+        "dateOffset": -5,
+        "amountUsd": 49.92
+      },
+      {
+        "dateOffset": -4,
+        "amountUsd": 53.04
+      },
+      {
+        "dateOffset": -3,
+        "amountUsd": 50.44
+      },
+      {
+        "dateOffset": -2,
+        "amountUsd": 53.56
+      },
+      {
+        "dateOffset": -1,
+        "amountUsd": 50.96
+      },
+      {
+        "dateOffset": 0,
+        "amountUsd": 54.08
+      }
+    ],
+    "serviceBreakdown": [
+      {
+        "service": "Amazon Elastic Compute Cloud",
+        "amountUsd": 654.33,
+        "percentage": 42.0
+      },
+      {
+        "service": "Amazon Relational Database Service",
+        "amountUsd": 280.43,
+        "percentage": 18.0
+      },
+      {
+        "service": "Amazon Elastic Block Store",
+        "amountUsd": 186.95,
+        "percentage": 12.0
+      },
+      {
+        "service": "Amazon Simple Storage Service",
+        "amountUsd": 124.63,
+        "percentage": 8.0
+      },
+      {
+        "service": "AWS Lambda",
+        "amountUsd": 109.05,
+        "percentage": 7.0
+      },
+      {
+        "service": "Amazon CloudWatch",
+        "amountUsd": 77.9,
+        "percentage": 5.0
+      },
+      {
+        "service": "Amazon Elastic Container Service",
+        "amountUsd": 77.9,
+        "percentage": 5.0
+      },
+      {
+        "service": "AWS Data Transfer",
+        "amountUsd": 46.74,
+        "percentage": 3.0
+      }
+    ]
+  },
+  "fx": {
+    "usdNgn": 1550,
+    "provider": "demo-fixture",
+    "observedAt": "2026-09-15T00:00:00Z"
+  },
+  "recommendations": [
+    {
+      "externalId": "FX-PRESSURE-REC-001",
+      "source": "AWS Cost Optimization Hub",
+      "resourceType": "Ec2Instance",
+      "resourceId": "i-0demo001",
+      "region": "eu-west-1",
+      "actionType": "Rightsize",
+      "currentConfiguration": "m6i.2xlarge",
+      "recommendedConfiguration": "m6i.xlarge",
+      "estimatedMonthlyCostUsd": 286.4,
+      "estimatedMonthlySavingsUsd": 118.7,
+      "savingsPercentage": 41.45,
+      "effort": "Low",
+      "restartRequired": true,
+      "rollbackPossible": true
+    },
+    {
+      "externalId": "FX-PRESSURE-REC-002",
+      "source": "AWS Compute Optimizer",
+      "resourceType": "EbsVolume",
+      "resourceId": "vol-0demo002",
+      "region": "eu-west-1",
+      "actionType": "Optimize storage",
+      "currentConfiguration": "gp3 500 GiB",
+      "recommendedConfiguration": "gp3 250 GiB",
+      "estimatedMonthlyCostUsd": 40.0,
+      "estimatedMonthlySavingsUsd": 20.0,
+      "savingsPercentage": 50.0,
+      "effort": "Low",
+      "restartRequired": false,
+      "rollbackPossible": true
+    }
+  ]
+}

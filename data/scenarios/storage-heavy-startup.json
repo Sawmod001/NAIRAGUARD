@@ -1,0 +1,197 @@
+{
+  "scenario": {
+    "id": "storage-heavy-startup",
+    "name": "Storage-Heavy Startup",
+    "accountId": "999992421640"
+  },
+  "cost": {
+    "periodDays": 30,
+    "daily": [
+      {
+        "dateOffset": -29,
+        "amountUsd": 73.15
+      },
+      {
+        "dateOffset": -28,
+        "amountUsd": 77.77
+      },
+      {
+        "dateOffset": -27,
+        "amountUsd": 73.92
+      },
+      {
+        "dateOffset": -26,
+        "amountUsd": 78.54
+      },
+      {
+        "dateOffset": -25,
+        "amountUsd": 74.69
+      },
+      {
+        "dateOffset": -24,
+        "amountUsd": 79.31
+      },
+      {
+        "dateOffset": -23,
+        "amountUsd": 75.46
+      },
+      {
+        "dateOffset": -22,
+        "amountUsd": 80.08
+      },
+      {
+        "dateOffset": -21,
+        "amountUsd": 76.23
+      },
+      {
+        "dateOffset": -20,
+        "amountUsd": 80.85
+      },
+      {
+        "dateOffset": -19,
+        "amountUsd": 77.0
+      },
+      {
+        "dateOffset": -18,
+        "amountUsd": 73.15
+      },
+      {
+        "dateOffset": -17,
+        "amountUsd": 77.77
+      },
+      {
+        "dateOffset": -16,
+        "amountUsd": 73.92
+      },
+      {
+        "dateOffset": -15,
+        "amountUsd": 78.54
+      },
+      {
+        "dateOffset": -14,
+        "amountUsd": 74.69
+      },
+      {
+        "dateOffset": -13,
+        "amountUsd": 79.31
+      },
+      {
+        "dateOffset": -12,
+        "amountUsd": 75.46
+      },
+      {
+        "dateOffset": -11,
+        "amountUsd": 80.08
+      },
+      {
+        "dateOffset": -10,
+        "amountUsd": 76.23
+      },
+      {
+        "dateOffset": -9,
+        "amountUsd": 80.85
+      },
+      {
+        "dateOffset": -8,
+        "amountUsd": 77.0
+      },
+      {
+        "dateOffset": -7,
+        "amountUsd": 73.15
+      },
+      {
+        "dateOffset": -6,
+        "amountUsd": 77.77
+      },
+      {
+        "dateOffset": -5,
+        "amountUsd": 73.92
+      },
+      {
+        "dateOffset": -4,
+        "amountUsd": 78.54
+      },
+      {
+        "dateOffset": -3,
+        "amountUsd": 74.69
+      },
+      {
+        "dateOffset": -2,
+        "amountUsd": 79.31
+      },
+      {
+        "dateOffset": -1,
+        "amountUsd": 75.46
+      },
+      {
+        "dateOffset": 0,
+        "amountUsd": 80.08
+      }
+    ],
+    "serviceBreakdown": [
+      {
+        "service": "Amazon Elastic Compute Cloud",
+        "amountUsd": 968.91,
+        "percentage": 42.0
+      },
+      {
+        "service": "Amazon Relational Database Service",
+        "amountUsd": 415.25,
+        "percentage": 18.0
+      },
+      {
+        "service": "Amazon Elastic Block Store",
+        "amountUsd": 276.83,
+        "percentage": 12.0
+      },
+      {
+        "service": "Amazon Simple Storage Service",
+        "amountUsd": 184.55,
+        "percentage": 8.0
+      },
+      {
+        "service": "AWS Lambda",
+        "amountUsd": 161.48,
+        "percentage": 7.0
+      },
+      {
+        "service": "Amazon CloudWatch",
+        "amountUsd": 115.35,
+        "percentage": 5.0
+      },
+      {
+        "service": "Amazon Elastic Container Service",
+        "amountUsd": 115.35,
+        "percentage": 5.0
+      },
+      {
+        "service": "AWS Data Transfer",
+        "amountUsd": 69.21,
+        "percentage": 3.0
+      }
+    ]
+  },
+  "fx": {
+    "usdNgn": 1550,
+    "provider": "demo-fixture",
+    "observedAt": "2026-09-15T00:00:00Z"
+  },
+  "recommendations": [
+    {
+      "externalId": "STORAGE-HEAVY-STARTUP-REC-001",
+      "source": "AWS Compute Optimizer",
+      "resourceType": "EbsVolume",
+      "resourceId": "vol-0demo005",
+      "region": "us-east-1",
+      "actionType": "Optimize storage",
+      "currentConfiguration": "gp2 1000 GiB",
+      "recommendedConfiguration": "gp3 600 GiB",
+      "estimatedMonthlyCostUsd": 100.0,
+      "estimatedMonthlySavingsUsd": 45.0,
+      "savingsPercentage": 45.0,
+      "effort": "Low",
+      "restartRequired": false,
+      "rollbackPossible": true
+    }
+  ]
+}

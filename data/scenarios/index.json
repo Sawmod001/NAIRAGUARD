@@ -1,0 +1,32 @@
+{
+  "version": "1.0",
+  "currency": "USD",
+  "baseFxQuote": "NGN",
+  "scenarios": [
+    {
+      "id": "balanced-startup",
+      "name": "Balanced Startup",
+      "description": "Moderate multi-service AWS workload with a few optimization opportunities."
+    },
+    {
+      "id": "waste-heavy-startup",
+      "name": "Waste-Heavy Startup",
+      "description": "Higher idle and rightsizing opportunities."
+    },
+    {
+      "id": "ec2-heavy-startup",
+      "name": "EC2-Heavy Startup",
+      "description": "Compute-heavy workload with rightsizing opportunities."
+    },
+    {
+      "id": "storage-heavy-startup",
+      "name": "Storage-Heavy Startup",
+      "description": "Storage-heavy workload with EBS and data-storage opportunities."
+    },
+    {
+      "id": "fx-pressure",
+      "name": "FX Pressure",
+      "description": "Moderate USD spend with large Naira sensitivity."
+    }
+  ]
+}

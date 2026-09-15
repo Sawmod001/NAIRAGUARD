@@ -1,0 +1,229 @@
+{
+  "scenario": {
+    "id": "waste-heavy-startup",
+    "name": "Waste-Heavy Startup",
+    "accountId": "999974319585"
+  },
+  "cost": {
+    "periodDays": 30,
+    "daily": [
+      {
+        "dateOffset": -29,
+        "amountUsd": 67.73
+      },
+      {
+        "dateOffset": -28,
+        "amountUsd": 72.01
+      },
+      {
+        "dateOffset": -27,
+        "amountUsd": 68.45
+      },
+      {
+        "dateOffset": -26,
+        "amountUsd": 72.73
+      },
+      {
+        "dateOffset": -25,
+        "amountUsd": 69.16
+      },
+      {
+        "dateOffset": -24,
+        "amountUsd": 73.44
+      },
+      {
+        "dateOffset": -23,
+        "amountUsd": 69.87
+      },
+      {
+        "dateOffset": -22,
+        "amountUsd": 74.15
+      },
+      {
+        "dateOffset": -21,
+        "amountUsd": 70.59
+      },
+      {
+        "dateOffset": -20,
+        "amountUsd": 74.86
+      },
+      {
+        "dateOffset": -19,
+        "amountUsd": 71.3
+      },
+      {
+        "dateOffset": -18,
+        "amountUsd": 67.73
+      },
+      {
+        "dateOffset": -17,
+        "amountUsd": 72.01
+      },
+      {
+        "dateOffset": -16,
+        "amountUsd": 68.45
+      },
+      {
+        "dateOffset": -15,
+        "amountUsd": 72.73
+      },
+      {
+        "dateOffset": -14,
+        "amountUsd": 69.16
+      },
+      {
+        "dateOffset": -13,
+        "amountUsd": 73.44
+      },
+      {
+        "dateOffset": -12,
+        "amountUsd": 69.87
+      },
+      {
+        "dateOffset": -11,
+        "amountUsd": 74.15
+      },
+      {
+        "dateOffset": -10,
+        "amountUsd": 70.59
+      },
+      {
+        "dateOffset": -9,
+        "amountUsd": 74.86
+      },
+      {
+        "dateOffset": -8,
+        "amountUsd": 71.3
+      },
+      {
+        "dateOffset": -7,
+        "amountUsd": 67.73
+      },
+      {
+        "dateOffset": -6,
+        "amountUsd": 72.01
+      },
+      {
+        "dateOffset": -5,
+        "amountUsd": 68.45
+      },
+      {
+        "dateOffset": -4,
+        "amountUsd": 72.73
+      },
+      {
+        "dateOffset": -3,
+        "amountUsd": 69.16
+      },
+      {
+        "dateOffset": -2,
+        "amountUsd": 73.44
+      },
+      {
+        "dateOffset": -1,
+        "amountUsd": 69.87
+      },
+      {
+        "dateOffset": 0,
+        "amountUsd": 74.15
+      }
+    ],
+    "serviceBreakdown": [
+      {
+        "service": "Amazon Elastic Compute Cloud",
+        "amountUsd": 897.17,
+        "percentage": 42.0
+      },
+      {
+        "service": "Amazon Relational Database Service",
+        "amountUsd": 384.5,
+        "percentage": 18.0
+      },
+      {
+        "service": "Amazon Elastic Block Store",
+        "amountUsd": 256.33,
+        "percentage": 12.0
+      },
+      {
+        "service": "Amazon Simple Storage Service",
+        "amountUsd": 170.89,
+        "percentage": 8.0
+      },
+      {
+        "service": "AWS Lambda",
+        "amountUsd": 149.53,
+        "percentage": 7.0
+      },
+      {
+        "service": "Amazon CloudWatch",
+        "amountUsd": 106.81,
+        "percentage": 5.0
+      },
+      {
+        "service": "Amazon Elastic Container Service",
+        "amountUsd": 106.81,
+        "percentage": 5.0
+      },
+      {
+        "service": "AWS Data Transfer",
+        "amountUsd": 64.08,
+        "percentage": 3.0
+      }
+    ]
+  },
+  "fx": {
+    "usdNgn": 1550,
+    "provider": "demo-fixture",
+    "observedAt": "2026-09-15T00:00:00Z"
+  },
+  "recommendations": [
+    {
+      "externalId": "WASTE-HEAVY-STARTUP-REC-001",
+      "source": "AWS Cost Optimization Hub",
+      "resourceType": "Ec2Instance",
+      "resourceId": "i-0demo001",
+      "region": "eu-west-1",
+      "actionType": "Rightsize",
+      "currentConfiguration": "m6i.2xlarge",
+      "recommendedConfiguration": "m6i.xlarge",
+      "estimatedMonthlyCostUsd": 286.4,
+      "estimatedMonthlySavingsUsd": 118.7,
+      "savingsPercentage": 41.45,
+      "effort": "Low",
+      "restartRequired": true,
+      "rollbackPossible": true
+    },
+    {
+      "externalId": "WASTE-HEAVY-STARTUP-REC-002",
+      "source": "AWS Compute Optimizer",
+      "resourceType": "EbsVolume",
+      "resourceId": "vol-0demo002",
+      "region": "eu-west-1",
+      "actionType": "Optimize storage",
+      "currentConfiguration": "gp3 500 GiB",
+      "recommendedConfiguration": "gp3 250 GiB",
+      "estimatedMonthlyCostUsd": 40.0,
+      "estimatedMonthlySavingsUsd": 20.0,
+      "savingsPercentage": 50.0,
+      "effort": "Low",
+      "restartRequired": false,
+      "rollbackPossible": true
+    },
+    {
+      "externalId": "WASTE-HEAVY-STARTUP-REC-003",
+      "source": "AWS Cost Optimization Hub",
+      "resourceType": "Ec2Instance",
+      "resourceId": "i-0demo003",
+      "region": "us-east-1",
+      "actionType": "Idle resource",
+      "currentConfiguration": "c6i.xlarge",
+      "recommendedConfiguration": "Delete after validation",
+      "estimatedMonthlyCostUsd": 122.0,
+      "estimatedMonthlySavingsUsd": 122.0,
+      "savingsPercentage": 100.0,
+      "effort": "Low",
+      "restartRequired": false,
+      "rollbackPossible": false
+    }
+  ]
+}
