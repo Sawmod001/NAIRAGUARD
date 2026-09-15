@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import { SpendOverview } from "@/components/dashboard/spend-overview";
+import { CostTrend } from "@/components/dashboard/cost-trend";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -30,12 +31,10 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      {/* Middle: trend + drivers — stack on mobile, side-by-side on desktop */}
+      {/* Middle: trend + drivers — NG-404 trend wired, drivers shell */}
       <div className="grid gap-4 lg:grid-cols-3">
-        <div className="rounded-xl border border-zinc-200 bg-white p-5 lg:col-span-2">
-          <div className="text-xs font-semibold uppercase tracking-widest text-zinc-500">Cost trend</div>
-          <div className="mt-4 h-32 rounded bg-zinc-50" />
-          <div className="mt-2 text-xs text-zinc-500">NG-404 — daily/weekly trend</div>
+        <div className="lg:col-span-2">
+          <CostTrend />
         </div>
         <div className="rounded-xl border border-zinc-200 bg-white p-5">
           <div className="text-xs font-semibold uppercase tracking-widest text-zinc-500">Top drivers</div>
