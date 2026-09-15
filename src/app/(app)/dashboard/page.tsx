@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import { SpendOverview } from "@/components/dashboard/spend-overview";
 import { CostTrend } from "@/components/dashboard/cost-trend";
 import { CostDrivers } from "@/components/dashboard/cost-drivers";
+import { OptimizationHighlights } from "@/components/dashboard/optimization-highlights";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -40,12 +41,7 @@ export default async function DashboardPage() {
         <CostDrivers />
       </div>
 
-      <div className="rounded-xl border border-zinc-200 bg-white p-5">
-        <div className="text-xs font-semibold uppercase tracking-widest text-zinc-500">Optimization highlights</div>
-        <div className="mt-3 rounded-md border border-dashed border-zinc-300 bg-zinc-50 p-4 text-sm text-zinc-600">
-          Shell placeholder — 3 high-value opportunities will appear here (NG-406).
-        </div>
-      </div>
+      <OptimizationHighlights />
     </div>
   );
 }
