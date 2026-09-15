@@ -9,7 +9,7 @@ out
 dist
 build
 
-# env — never commit secrets
+# env ï¿½ never commit secrets
 .env
 .env.local
 .env.development.local
@@ -17,8 +17,8 @@ build
 .env.production.local
 .env.*.local
 
-# prisma
-prisma/migrations/
+# prisma - keep migrations tracked (NG-004 workflow); ignore generated client
+# prisma/migrations/  # intentionally tracked from NG-004 onward
 
 # logs
 npm-debug.log*
@@ -40,5 +40,5 @@ Thumbs.db
 *.tsbuildinfo
 coverage
 
-# keep build pack source (optional — remove if you want it tracked)
+# keep build pack source (optional ï¿½ remove if you want it tracked)
 NairaGuard_Build_Pack/

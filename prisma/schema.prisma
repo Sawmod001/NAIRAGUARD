@@ -1,0 +1,36 @@
+// NairaGuard Prisma Schema — NG-004 Foundation
+// Do NOT add full product models prematurely. This file establishes:
+// - PostgreSQL via DATABASE_URL (env validated in src/lib/env)
+// - Prisma Client generation workflow
+// - Minimal placeholder models to prove migrations work
+// Full models (User/Organization/CostSnapshot/Recommendation etc per docs/05_DATA_MODEL.md) land in NG-1xx/NG-3xx tickets.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Minimal foundation model — proves DB + migrations plumbing without locking in full domain.
+// Will be migrated/expanded in NG-103+ (User/Organization) and NG-301+ (Cost/Recommendation).
+// Keep this tiny to honor NG-004 "no premature models".
+model HealthCheck {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  status    String   @default("ok")
+
+  @@map("health_checks")
+}
+
+// --- Future models (commented, for reference only) ---
+// model Organization { id String @id @default(cuid()) ... } // NG-103
+// model User { id String @id @default(cuid()) ... } // NG-103
+// model Membership { ... } // NG-103
+// model CostSnapshot { ... } // NG-301
+// model CostBreakdown { ... } // NG-302
+// model Recommendation { ... } // NG-401
+// model FxRate { ... } // NG-501
+// model AIAnalysis { ... } // NG-601
