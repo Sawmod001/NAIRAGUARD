@@ -17,9 +17,11 @@
     "db:studio": "prisma studio"
   },
   "dependencies": {
-    "@clerk/nextjs": "^7.9.2",
+    "@auth/prisma-adapter": "^2.11.3",
     "@prisma/client": "6.14.0",
+    "bcryptjs": "^3.0.3",
     "next": "16.3.5",
+    "next-auth": "5.0.0-beta.32",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "server-only": "^0.0.1",
@@ -28,6 +30,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "3.3.7",
     "@tailwindcss/postcss": "^4.1.0",
+    "@types/bcryptjs": "^3.0.0",
     "@types/node": "^22.13.0",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",

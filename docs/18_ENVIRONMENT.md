@@ -36,9 +36,12 @@ FX_MODE=live
 
 ## Environment categories
 
-Authentication:
-- Clerk publishable key
-- Clerk secret key
+Authentication (Auth.js, server-only):
+- AUTH_SECRET
+- AUTH_URL
+- DATABASE_URL (for session persistence)
+- RESEND_API_KEY (when email verification enabled)
+- EMAIL_FROM (verified domain, when verification enabled)
 
 Database:
 - DATABASE_URL

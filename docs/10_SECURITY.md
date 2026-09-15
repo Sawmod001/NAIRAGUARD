@@ -6,7 +6,7 @@ Demo Mode must still be built like a real multi-tenant application.
 
 ## Authentication
 
-Use Clerk for authentication unless a later architecture decision replaces it.
+Use Auth.js (NextAuth v5) with Prisma/PostgreSQL and secure httpOnly session cookies. Application owns identity/authorization; Auth.js handles cryptographic session, password hashing (bcrypt), CSRF and OAuth mechanics. No `NEXT_PUBLIC_` auth secrets.
 
 ## Authorization
 

@@ -1,8 +1,7 @@
 /**
- * Auth adapter — NG-101
- * Keeps Clerk out of domain/application logic. App code calls `requireAuth()`
- * instead of importing @clerk directly.
- * per docs/03_ARCHITECTURE.md: Infrastructure/auth isolates provider.
+ * Auth boundary — NG-101 Real Prod
+ * App code imports from "@/lib/auth", never from "next-auth" or "next-auth/react" directly.
+ * Keeps Auth.js isolated per docs/03.
  */
-
 export { requireAuth, getAuth, isAuthenticated } from "./helpers";
+export { signUp } from "./actions";

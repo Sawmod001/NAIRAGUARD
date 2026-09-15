@@ -1,4 +1,7 @@
-import { SignIn } from "@clerk/nextjs";
+import { Suspense } from "react";
+import { SignInForm } from "./form";
+
+export const dynamic = "force-dynamic";
 
 export default function SignInPage() {
   return (
@@ -6,9 +9,11 @@ export default function SignInPage() {
       <div className="w-full max-w-md">
         <div className="mb-6 text-center">
           <h1 className="text-2xl font-semibold tracking-tight">Sign in to NairaGuard</h1>
-          <p className="mt-2 text-sm text-zinc-600">Demo Mode — synthetic AWS FinOps data</p>
+          <p className="mt-2 text-sm text-zinc-600">Secure session • Demo Mode ready after login</p>
         </div>
-        <SignIn routing="path" path="/sign-in" signUpUrl="/sign-up" fallbackRedirectUrl="/dashboard" />
+        <Suspense fallback={null}>
+          <SignInForm />
+        </Suspense>
       </div>
     </main>
   );

@@ -34,13 +34,15 @@ Reason:
 
 Prisma provides an established Next.js/PostgreSQL integration path. citeturn0search2turn0search12
 
-## ADR-004 — Clerk Authentication
+## ADR-004 — Auth.js Authentication (supersedes Clerk)
 
 Decision:
-Use Clerk for MVP authentication.
+Use Auth.js (NextAuth v5) with Prisma/PostgreSQL and secure httpOnly cookie sessions. App owns identity/authorization layer; Auth.js owns cryptographic auth mechanics (hashing, session, CSRF).
 
 Reason:
-Avoid building authentication infrastructure while keeping the product secure.
+Application-owned identity required for tenant/org evolution; avoids vendor lock-in; keeps secrets server-only (`AUTH_SECRET`); Prisma persistence aligns with docs/05_DATA_MODEL.md.
+
+Superseded: Clerk for MVP (commit cccc440) — removed in corrective migration per NG-101.
 
 ## ADR-005 — AI is not financial authority
 

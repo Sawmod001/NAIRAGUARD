@@ -1,38 +1,37 @@
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { auth } from "@/auth";
 
-// NG-101: Protect application routes. Public: /, sign-in, sign-up, privacy, terms.
-// Clerk keys missing in Demo CI → allow build to pass (middleware becomes no-op).
-const isPublicRoute = createRouteMatcher([
+/**
+ * Auth guard — NG-101 Real Prod
+ * Server-enforced (docs/10_SECURITY). Protects /(app)/*, leaves public routes open.
+ * Uses secure httpOnly session cookie (Auth.js DB sessions).
+ */
+
+const publicRoutes = [
   "/",
-  "/sign-in(.*)",
-  "/sign-up(.*)",
-  "/privacy(.*)",
-  "/terms(.*)",
-  // Next internals + static
-  "/_next(.*)",
-  "/favicon.ico",
-]);
+  "/sign-in",
+  "/sign-up",
+  "/privacy",
+  "/terms",
+  "/api/auth",
+];
 
-const hasClerkKeys =
-  !!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY && !!process.env.CLERK_SECRET_KEY;
+function isPublic(pathname: string): boolean {
+  return publicRoutes.some((p) => pathname === p || pathname.startsWith(p + "/"));
+}
 
-export default hasClerkKeys
-  ? clerkMiddleware(async (auth, req) => {
-      if (!isPublicRoute(req)) {
-        await auth.protect();
-      }
-    })
-  : () => {
-      // No-op when keys missing — allows `pnpm build` in Demo without Clerk.
-      // Real deploy (NG-101 acceptance) must set keys; otherwise routes remain unprotected.
-      return;
-    };
+export default auth((req) => {
+  const { pathname } = req.nextUrl;
+  // Skip Next internals
+  if (pathname.startsWith("/_next") || pathname === "/favicon.ico") return;
+  if (isPublic(pathname)) return;
+  // Protected: require session, else redirect to /sign-in
+  if (!req.auth) {
+    const url = new URL("/sign-in", req.nextUrl.origin);
+    url.searchParams.set("callbackUrl", req.nextUrl.pathname);
+    return Response.redirect(url);
+  }
+});
 
 export const config = {
-  matcher: [
-    // Skip Next.js internals and static files
-    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
-    // Always run for API routes
-    "/(api|trpc)(.*)",
-  ],
+  matcher: ["/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)"],
 };

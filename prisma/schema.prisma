@@ -1,9 +1,6 @@
-// NairaGuard Prisma Schema — NG-004 Foundation
-// Do NOT add full product models prematurely. This file establishes:
-// - PostgreSQL via DATABASE_URL (env validated in src/lib/env)
-// - Prisma Client generation workflow
-// - Minimal placeholder models to prove migrations work
-// Full models (User/Organization/CostSnapshot/Recommendation etc per docs/05_DATA_MODEL.md) land in NG-1xx/NG-3xx tickets.
+// NairaGuard Prisma Schema — NG-101 Real Prod (Auth.js)
+// PostgreSQL via DATABASE_URL, Auth.js v5 + PrismaAdapter + DB sessions (httpOnly secure cookie)
+// Verification dormant: EMAIL_FROM not set → no email sent, ready when domain verified
 
 generator client {
   provider = "prisma-client-js"
@@ -14,9 +11,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Minimal foundation model — proves DB + migrations plumbing without locking in full domain.
-// Will be migrated/expanded in NG-103+ (User/Organization) and NG-301+ (Cost/Recommendation).
-// Keep this tiny to honor NG-004 "no premature models".
+// Minimal health check — retains NG-004 foundation
 model HealthCheck {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
@@ -25,12 +20,61 @@ model HealthCheck {
   @@map("health_checks")
 }
 
-// --- Future models (commented, for reference only) ---
-// model Organization { id String @id @default(cuid()) ... } // NG-103
-// model User { id String @id @default(cuid()) ... } // NG-103
-// model Membership { ... } // NG-103
-// model CostSnapshot { ... } // NG-301
-// model CostBreakdown { ... } // NG-302
-// model Recommendation { ... } // NG-401
-// model FxRate { ... } // NG-501
-// model AIAnalysis { ... } // NG-601
+// --- Auth.js models (PrismaAdapter) ---
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  // Credentials: stored as bcrypt hash, never plaintext (NG-101 prod)
+  password      String?
+  accounts      Account[]
+  sessions      Session[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("users")
+}
+
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@id([identifier, token])
+  @@map("verification_tokens")
+}
+
+// Future per docs/05: Organization/Membership/CostSnapshot/Recommendation/FxRate deferred to NG-103+/301+
