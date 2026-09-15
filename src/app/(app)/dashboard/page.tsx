@@ -1,4 +1,5 @@
 import { auth } from "@/auth";
+import { SpendOverview } from "@/components/dashboard/spend-overview";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -14,22 +15,18 @@ export default async function DashboardPage() {
         <div className="text-xs text-zinc-500">NG-401 shell — responsive, no experimental visuals</div>
       </div>
 
-      {/* Top metrics — shell grid, responsive */}
+      {/* Top metrics — NG-402 spend overview wired */}
       <div className="grid gap-4 md:grid-cols-3">
-        <div className="rounded-xl border border-zinc-200 bg-white p-5">
-          <div className="text-xs font-semibold uppercase tracking-widest text-zinc-500">Total spend</div>
-          <div className="mt-2 h-4 w-24 rounded bg-zinc-100" />
-          <div className="mt-1 text-xs text-zinc-500">NG-402 will populate</div>
-        </div>
+        <SpendOverview />
         <div className="rounded-xl border border-zinc-200 bg-white p-5">
           <div className="text-xs font-semibold uppercase tracking-widest text-zinc-500">Potential savings</div>
           <div className="mt-2 h-4 w-24 rounded bg-zinc-100" />
           <div className="mt-1 text-xs text-zinc-500">NG-406 will populate</div>
         </div>
         <div className="rounded-xl border border-zinc-200 bg-white p-5">
-          <div className="text-xs font-semibold uppercase tracking-widest text-zinc-500">Estimated Naira</div>
+          <div className="text-xs font-semibold uppercase tracking-widest text-zinc-500">Top optimization</div>
           <div className="mt-2 h-4 w-32 rounded bg-zinc-100" />
-          <div className="mt-1 text-xs text-zinc-500">NG-403 will populate</div>
+          <div className="mt-1 text-xs text-zinc-500">NG-406 will populate</div>
         </div>
       </div>
 
