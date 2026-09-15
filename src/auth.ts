@@ -38,6 +38,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (requireEmailVerification && !user.emailVerified) return null;
         const ok = await bcrypt.compare(password, user.password);
         if (!ok) return null;
+        // NG-103: ensure personal organization exists (idempotent, for users created before NG-103)
+        const existingMembership = await prisma.membership.findFirst({ where: { userId: user.id } });
+        if (!existingMembership) {
+          const orgName = (user.name?.trim() || user.email.split("@")[0] || "Personal") + "'s Workspace";
+          const org = await prisma.organization.create({ data: { name: orgName } });
+          await prisma.membership.create({ data: { userId: user.id, organizationId: org.id, role: "owner" } });
+        }
         return { id: user.id, email: user.email, name: user.name ?? undefined };
       },
     }),

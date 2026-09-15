@@ -27,11 +27,14 @@ export async function signUp(raw: unknown): Promise<{ ok: true; userId: string }
   }
   const hash = await bcrypt.hash(password, 12);
   try {
-    const user = await prisma.user.create({
-      data: { email, password: hash, name: name?.trim() || null },
+    const result = await prisma.$transaction(async (tx) => {
+      const user = await tx.user.create({ data: { email, password: hash, name: name?.trim() || null } });
+      const orgName = (name?.trim() || email.split("@")[0] || "Personal") + "'s Workspace";
+      const org = await tx.organization.create({ data: { name: orgName } });
+      await tx.membership.create({ data: { userId: user.id, organizationId: org.id, role: "owner" } });
+      return user;
     });
-    // Dormant: when Resend + EMAIL_FROM verified, create VerificationToken + send email here
-    return { ok: true, userId: user.id };
+    return { ok: true, userId: result.id };
   } catch (e) {
     throw new AppError({ code: ErrorCode.DB_FAILURE, message: "Could not create account.", cause: e });
   }
