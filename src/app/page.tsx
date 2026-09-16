@@ -1,5 +1,6 @@
 import { Hero } from "@/components/marketing/hero";
 import { Story } from "@/components/marketing/story";
+import { InteractiveViz } from "@/components/marketing/interactive-viz";
 
 export default function Home() {
   return (
@@ -15,6 +16,9 @@ export default function Home() {
       </header>
       <Hero />
       <Story />
+      <div className="mx-auto max-w-6xl px-6">
+        <InteractiveViz />
+      </div>
       <div className="mx-auto max-w-5xl px-6 py-16">
 
         <div className="mt-8 grid gap-4 sm:grid-cols-3">
