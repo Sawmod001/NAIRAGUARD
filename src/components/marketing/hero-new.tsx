@@ -42,29 +42,42 @@ export function HeroNew() {
           <div className="mt-3 font-mono text-xs tracking-wide text-zinc-500">Demo Mode · No AWS account required</div>
         </div>
 
-        {/* Visual story — meaning-driven, not decorative */}
-        <div className="relative flex flex-col justify-between rounded-2xl border border-zinc-800 bg-zinc-900 p-6">
-          <div className="font-mono text-xs tracking-widest text-zinc-500">VISUAL STORY • {steps[active]!.label}</div>
-          <div className="mt-4 space-y-2">
-            {steps.map((s, i) => (
-              <div key={s.label} className={`flex items-center justify-between rounded-lg border px-3 py-2 text-sm transition-all ${i === active ? "border-orange-500 bg-zinc-800 text-white" : i < active ? "border-zinc-700 bg-zinc-800/50 text-zinc-300" : "border-zinc-800 text-zinc-500"}`}>
-                <span className="font-mono text-xs">{s.label}</span>
-                <span className="text-xs">{s.sub}</span>
+        {/* Visual story — product UI + human context, not decorative */}
+        <div className="relative overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900">
+          {/* Business image — human context, masked transition with story */}
+          <div className="relative h-48 overflow-hidden">
+            <img
+              src="/istockphoto-2094337676-612x612.jpg"
+              alt="Business team reviewing data"
+              className="h-full w-full object-cover transition-all duration-700"
+              style={{ clipPath: active >= 2 ? "inset(0 0 0 0)" : "inset(0 50% 0 0)", filter: active >= 4 ? "grayscale(0)" : "grayscale(1)" }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-transparent to-transparent" />
+            <div className="absolute bottom-2 left-3 rounded bg-black/70 px-2 py-1 font-mono text-[10px] tracking-widest text-white">HUMAN • BUSINESS DECISION</div>
+          </div>
+          <div className="p-6">
+            <div className="font-mono text-xs tracking-widest text-zinc-500">VISUAL STORY • {steps[active]!.label}</div>
+            <div className="mt-3 space-y-1.5">
+              {steps.map((s, i) => (
+                <div key={s.label} className={`flex items-center justify-between rounded-lg border px-3 py-1.5 text-xs transition-all ${i === active ? "border-orange-500 bg-zinc-800 text-white" : i < active ? "border-zinc-700 bg-zinc-800/50 text-zinc-300" : "border-zinc-800 text-zinc-500"}`}>
+                  <span className="font-mono">{s.label}</span>
+                  <span>{s.sub}</span>
+                </div>
+              ))}
+            </div>
+            <div className="mt-4 grid grid-cols-3 gap-2 text-xs">
+              <div className="rounded bg-white p-3 text-black">
+                <div className="font-mono text-[10px] tracking-widest text-zinc-500">USD</div>
+                <div className="font-semibold">$118.70</div>
               </div>
-            ))}
-          </div>
-          <div className="mt-4 grid grid-cols-3 gap-2 text-xs">
-            <div className="rounded bg-white p-3 text-black">
-              <div className="font-mono text-[10px] tracking-widest text-zinc-500">USD</div>
-              <div className="font-semibold">$118.70</div>
+              <div className="flex items-center justify-center text-zinc-500">× 1,550</div>
+              <div className="rounded bg-orange-500 p-3 text-black">
+                <div className="font-mono text-[10px] tracking-widest">EST. NGN</div>
+                <div className="font-semibold">₦183,985</div>
+              </div>
             </div>
-            <div className="flex items-center justify-center text-zinc-500">× 1,550</div>
-            <div className="rounded bg-orange-500 p-3 text-black">
-              <div className="font-mono text-[10px] tracking-widest">EST. NGN</div>
-              <div className="font-semibold">₦183,985</div>
-            </div>
+            <div className="mt-2 text-center font-mono text-[10px] tracking-widest text-zinc-500">DETERMINISTIC • 2026-09-15 • demo-fixture</div>
           </div>
-          <div className="mt-2 text-center font-mono text-[10px] tracking-widest text-zinc-500">DETERMINISTIC • 2026-09-15 • demo-fixture</div>
         </div>
       </div>
     </section>

@@ -6,6 +6,10 @@ export function Problem() {
           <div>
             <div className="font-mono text-xs tracking-[0.2em] text-zinc-500">THE CLOUD COST PROBLEM</div>
             <h2 className="font-display mt-3 text-[clamp(28px,4vw,44px)] font-semibold leading-[0.95] tracking-tight">Your infrastructure runs in AWS. Your business runs in naira.</h2>
+            <div className="mt-6 overflow-hidden rounded-xl border border-zinc-200">
+              <img src="/istockphoto-2214940115-612x612.jpg" alt="Business team discussing budget" className="h-64 w-full object-cover" />
+              <div className="bg-zinc-900 px-3 py-2 font-mono text-xs tracking-widest text-white">HUMAN • BUDGET DECISION</div>
+            </div>
           </div>
           <div>
             <p className="text-sm leading-6 text-zinc-600">Cloud infrastructure is easy to deploy and difficult to understand financially. Usage grows, resources stay idle, services become over-provisioned, and the bill arrives in USD. For Nigerian teams, that number changes meaning when the naira moves.</p>
@@ -24,6 +28,7 @@ export function Problem() {
               </div>
             </div>
             <div className="mt-6 flex justify-center font-mono text-xs tracking-widest text-zinc-400">↓ USD → HIDDEN WASTE → NGN ↓</div>
+            <div className="mt-6 rounded-xl border border-orange-200 bg-orange-50 p-4 text-sm text-zinc-700">Spend is spread • Waste invisible until investigated • Pricing evidence hard to interpret • USD needs local context</div>
           </div>
         </div>
       </div>
