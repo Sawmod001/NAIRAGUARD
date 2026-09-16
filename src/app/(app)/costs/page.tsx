@@ -5,6 +5,7 @@ import { normalizeCostResult } from "@/domain/costs/normalize";
 import { toNairaEquivalent } from "@/domain/fx";
 import { getDemoDataset } from "@/infrastructure/providers/demo/registry";
 import Link from "next/link";
+import { ServiceBreakdown } from "@/components/costs/service-breakdown";
 
 export default async function CostsPage({ searchParams }: { searchParams: Promise<{ period?: string }> }) {
   const session = await auth();
@@ -56,19 +57,7 @@ export default async function CostsPage({ searchParams }: { searchParams: Promis
         </div>
       </div>
 
-      <div className="rounded-xl border border-zinc-200 bg-white p-5">
-        <div className="text-xs uppercase tracking-widest text-zinc-500">Service breakdown</div>
-        <div className="mt-3 space-y-2">
-          {cost.services
-            .sort((a, b) => b.amount - a.amount)
-            .map((s) => (
-              <div key={s.service} className="flex justify-between border-b border-zinc-100 py-2 text-sm">
-                <span>{s.service}</span>
-                <span className="font-medium">${s.amount.toFixed(2)} • {s.percentage.toFixed(1)}%</span>
-              </div>
-            ))}
-        </div>
-      </div>
+      <ServiceBreakdown services={cost.services} total={cost.total} />
 
       <div className="rounded-xl border border-zinc-200 bg-white p-5">
         <div className="text-xs uppercase tracking-widest text-zinc-500">Trend (daily)</div>
