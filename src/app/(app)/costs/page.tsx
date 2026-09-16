@@ -7,6 +7,7 @@ import { getDemoDataset } from "@/infrastructure/providers/demo/registry";
 import Link from "next/link";
 import { ServiceBreakdown } from "@/components/costs/service-breakdown";
 import { RegionBreakdown } from "@/components/costs/region-breakdown";
+import { PeriodComparison } from "@/components/costs/period-comparison";
 
 export default async function CostsPage({ searchParams }: { searchParams: Promise<{ period?: string }> }) {
   const session = await auth();
@@ -60,6 +61,7 @@ export default async function CostsPage({ searchParams }: { searchParams: Promis
 
       <ServiceBreakdown services={cost.services} total={cost.total} />
       <RegionBreakdown regions={cost.regions} />
+      <PeriodComparison periodDays={period} />
 
       <div className="rounded-xl border border-zinc-200 bg-white p-5">
         <div className="text-xs uppercase tracking-widest text-zinc-500">Trend (daily)</div>
