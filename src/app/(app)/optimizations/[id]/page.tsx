@@ -6,6 +6,7 @@ import { convertUsdToNgn } from "@/domain/fx";
 import { getDemoDataset } from "@/infrastructure/providers/demo/registry";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { EvidenceDisplay } from "@/components/optimizations/evidence-display";
 
 export default async function RecommendationDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -67,13 +68,7 @@ export default async function RecommendationDetailPage({ params }: { params: Pro
         </div>
       </div>
 
-      {resource && (
-        <div className="rounded-xl border border-zinc-200 bg-white p-5">
-          <div className="text-xs uppercase tracking-widest text-zinc-500">Resource evidence</div>
-          <div className="mt-2 text-sm">ARN: <span className="font-mono text-xs">{resource.resourceArn}</span></div>
-          <div className="text-xs text-zinc-500">Region {resource.region} • Observed {new Date(resource.observedAt).toLocaleDateString()}</div>
-        </div>
-      )}
+      <EvidenceDisplay rec={rec} resource={resource} />
     </div>
   );
 }
