@@ -1,26 +1,36 @@
 @import "tailwindcss";
 
-/* NairaGuard Design Tokens — NG-001 minimal foundation
-   Full tokens (black/white/orange) land in NG-003 */
+/* NairaGuard Design System — Homepage Redesign */
 :root {
   --background: #ffffff;
   --foreground: #0a0a0a;
-  --accent: #ff6b00; /* NairaGuard orange — docs/13_UI_UX_DIRECTION */
+  --accent: #ff6b00;
+  --muted: #71717a;
+  --border: #e4e4e7;
+  --display: "Clash Display", sans-serif;
+  --body: "Satoshi", ui-sans-serif, system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, monospace;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-accent: var(--accent);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-display: var(--display);
+  --font-sans: var(--body);
+  --font-mono: var(--mono);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--body);
+  box-sizing: border-box;
 }
+*, *::before, *::after { box-sizing: border-box; }
+
+.font-display { font-family: var(--display); }
+.font-mono { font-family: var(--mono); }
 
 /* NG-905 a11y + performance */
 @media (prefers-reduced-motion: reduce) {
