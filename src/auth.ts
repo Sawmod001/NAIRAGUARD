@@ -23,7 +23,8 @@ const credentialsSchema = z.object({
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
-  session: { strategy: "database" },
+  // Credentials + database sessions unsupported per Auth.js — use JWT (still httpOnly secure cookie) with Prisma users
+  session: { strategy: "jwt" },
   trustHost: true,
   secret: process.env.AUTH_SECRET,
   providers: [
@@ -50,10 +51,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
-    // Keep session user id available
-    async session({ session, user }) {
-      if (session.user && user) {
-        (session.user as unknown as { id: string }).id = user.id;
+    async jwt({ token, user }) {
+      if (user) {
+        (token as unknown as { id?: string }).id = (user as unknown as { id: string }).id;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      const tid = (token as unknown as { id?: string })?.id;
+      if (session.user && tid) {
+        (session.user as unknown as { id: string }).id = tid;
       }
       return session;
     },
