@@ -42,3 +42,4 @@ coverage
 
 # keep build pack source (optional � remove if you want it tracked)
 NairaGuard_Build_Pack/
+dev-*.log
