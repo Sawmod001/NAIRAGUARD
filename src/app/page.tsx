@@ -1,8 +1,16 @@
 export default function Home() {
   return (
     <main className="min-h-screen bg-white text-zinc-900">
-      {/* NG-001 placeholder — not final homepage (NG-901..905).
-          Keeps NG-001 scope minimal: proves App Router boots. */}
+      {/* NG-901 Marketing shell — black/white/orange, structure only (NG-902 will add hero) */}
+      <header className="border-b border-zinc-200">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+          <span className="text-sm font-semibold">NairaGuard</span>
+          <nav className="flex gap-4 text-sm">
+            <a href="/sign-in" className="hover:text-orange-600">Sign in</a>
+            <a href="/sign-up" className="rounded-md bg-black px-3 py-1.5 text-white hover:bg-zinc-800">Sign up</a>
+          </nav>
+        </div>
+      </header>
       <div className="mx-auto max-w-5xl px-6 py-16">
         <div className="inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-zinc-50 px-3 py-1 text-xs font-medium tracking-wide text-zinc-600">
           <span className="h-2 w-2 rounded-full bg-[var(--accent)]" />
@@ -57,6 +65,9 @@ export default function Home() {
           </div>
         </div>
       </div>
+      <footer className="border-t border-zinc-200 py-6 text-center text-xs text-zinc-500">
+        <a href="/privacy" className="hover:text-black">Privacy</a> • <a href="/terms" className="hover:text-black">Terms</a> • <span className="text-orange-600">●</span> NairaGuard
+      </footer>
     </main>
   );
 }
