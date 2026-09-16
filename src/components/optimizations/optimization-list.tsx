@@ -11,7 +11,7 @@ import Link from "next/link";
  * Each rec: resource, type, savings USD/NGN, effort, impact (savings%), risk (restart/rollback), status, priority
  */
 
-export async function OptimizationList() {
+export async function OptimizationList({ searchParams }: { searchParams?: { effort?: string; region?: string; sort?: string } }) {
   const session = await auth();
   const userId = (session?.user as unknown as { id?: string })?.id;
   if (!userId) return <div>Unauthorized</div>;
@@ -30,7 +30,25 @@ export async function OptimizationList() {
 
   if (!recs.length) return <div className="rounded-xl border border-dashed p-6 text-sm text-zinc-600">No optimization opportunities.</div>;
 
-  const prioritized = prioritizeRecommendations(recs);
+  // Deterministic filtering
+  let filtered = recs;
+  if (searchParams?.effort) filtered = filtered.filter((r) => r.effort === searchParams.effort);
+  if (searchParams?.region) filtered = filtered.filter((r) => r.region === searchParams.region);
+
+  if (!filtered.length) return <div className="rounded-xl border border-dashed p-6 text-sm text-zinc-600">No matches for filters.</div>;
+
+  // Deterministic sorting
+  let prioritized = prioritizeRecommendations(filtered);
+  if (searchParams?.sort === "percentage") {
+    prioritized = [...filtered]
+      .sort((a, b) => (b.savingsPercentage ?? 0) - (a.savingsPercentage ?? 0) || b.estimatedMonthlySavingsUsd - a.estimatedMonthlySavingsUsd)
+      .map((r, i) => ({ ...r, nairaGuardScore: prioritizeRecommendations([r])[0]!.nairaGuardScore, rank: i + 1 } as typeof prioritized[0]));
+  } else if (searchParams?.sort === "effort") {
+    const order = { Low: 0, Medium: 1, High: 2 } as const;
+    prioritized = [...filtered]
+      .sort((a, b) => order[a.effort as keyof typeof order] - order[b.effort as keyof typeof order] || b.estimatedMonthlySavingsUsd - a.estimatedMonthlySavingsUsd)
+      .map((r, i) => ({ ...r, nairaGuardScore: prioritizeRecommendations([r])[0]!.nairaGuardScore, rank: i + 1 } as typeof prioritized[0]));
+  }
   const fxRate = dataset.fx.usdNgn;
 
   return (
