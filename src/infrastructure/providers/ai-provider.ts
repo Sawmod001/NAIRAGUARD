@@ -18,6 +18,7 @@ export type AIExplainInput = {
     effort: string;
     restartRequired: boolean;
     rollbackPossible: boolean;
+    actionType?: string;
   };
   fx?: { rate: number; observedAt: string } | null;
   nairaImpact?: { estimatedMonthlySavingsNgn: number } | null;

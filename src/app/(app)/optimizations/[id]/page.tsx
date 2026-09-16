@@ -7,6 +7,7 @@ import { getDemoDataset } from "@/infrastructure/providers/demo/registry";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { EvidenceDisplay } from "@/components/optimizations/evidence-display";
+import { AIExplanationCard } from "@/components/optimizations/ai-explanation";
 
 export default async function RecommendationDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -69,6 +70,7 @@ export default async function RecommendationDetailPage({ params }: { params: Pro
       </div>
 
       <EvidenceDisplay rec={rec} resource={resource} />
+      <AIExplanationCard rec={rec} fxRate={fxRate} />
     </div>
   );
 }
