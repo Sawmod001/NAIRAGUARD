@@ -1,4 +1,5 @@
 import { Hero } from "@/components/marketing/hero";
+import { Story } from "@/components/marketing/story";
 
 export default function Home() {
   return (
@@ -13,6 +14,7 @@ export default function Home() {
         </div>
       </header>
       <Hero />
+      <Story />
       <div className="mx-auto max-w-5xl px-6 py-16">
 
         <div className="mt-8 grid gap-4 sm:grid-cols-3">
