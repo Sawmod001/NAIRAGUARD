@@ -31,9 +31,8 @@ const optionalNonEmpty = z
   .optional()
   .transform((v) => (v === "" ? undefined : v));
 
-// --- Client (NEXT_PUBLIC_ only) ---
+// --- Client (NEXT_PUBLIC_ only) — no auth secrets per docs/10 ---
 export const clientEnvSchema = z.object({
-  NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: optionalNonEmpty,
   NEXT_PUBLIC_APP_URL: z
     .string()
     .trim()
@@ -56,9 +55,11 @@ export const serverEnvSchema = z
     // For NG-003 we keep it optional so Demo boots without DB.
     DATABASE_URL: optionalNonEmpty,
 
-    // Auth — Clerk (required from NG-101 onward; optional for NG-003)
-    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: optionalNonEmpty,
-    CLERK_SECRET_KEY: optionalNonEmpty,
+    // Auth — Auth.js (server-only, no NEXT_PUBLIC_)
+    AUTH_SECRET: optionalNonEmpty,
+    AUTH_URL: optionalUrl,
+    RESEND_API_KEY: optionalNonEmpty,
+    EMAIL_FROM: optionalNonEmpty,
 
     // AI provider — required only when AI_MODE=live
     AI_PROVIDER_API_KEY: optionalNonEmpty,
