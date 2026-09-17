@@ -51,30 +51,60 @@ export async function OptimizationList({ searchParams }: { searchParams?: { effo
   }
   const fxRate = dataset.fx.usdNgn;
 
+  // Production table — dense, sticky header, right-aligned monetary, keyboard accessible; stacked on mobile
   return (
-    <div className="space-y-3">
-      {prioritized.map((r) => (
-        <Link key={r.externalId} href={`/optimizations/${r.externalId}`} className="block rounded-xl border border-zinc-200 bg-white p-5 hover:bg-zinc-50">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <div className="text-sm font-semibold">{r.resourceId} • {r.resourceType}</div>
-              <div className="text-xs text-zinc-600">{r.actionType} • {r.source} • {r.region}</div>
-              <div className="mt-2 flex flex-wrap gap-1 text-xs">
-                <span className="rounded bg-zinc-900 px-1.5 py-0.5 text-white">Rank {r.rank} • Score {r.nairaGuardScore}</span>
-                <span className="rounded bg-zinc-100 px-1.5 py-0.5">{r.effort} effort</span>
-                <span className={`rounded px-1.5 py-0.5 ${r.restartRequired ? "bg-amber-100 text-amber-800" : "bg-emerald-100 text-emerald-800"}`}>{r.restartRequired ? "restart" : "no restart"}</span>
-                <span className={`rounded px-1.5 py-0.5 ${r.rollbackPossible ? "bg-emerald-100 text-emerald-800" : "bg-red-100 text-red-800"}`}>{r.rollbackPossible ? "rollback" : "no rollback"}</span>
-                <span className="rounded bg-zinc-100 px-1.5 py-0.5">{r.status}</span>
-              </div>
+    <>
+      <div className="hidden overflow-x-auto rounded-xl border border-zinc-200 bg-white md:block">
+        <table className="w-full text-sm">
+          <thead className="sticky top-0 bg-zinc-50">
+            <tr className="border-b border-zinc-200 text-left font-mono text-xs tracking-widest text-zinc-500">
+              <th className="px-4 py-3 font-medium">RESOURCE</th>
+              <th className="px-4 py-3 font-medium">OPPORTUNITY</th>
+              <th className="px-4 py-3 font-medium">REGION</th>
+              <th className="px-4 py-3 text-right font-medium">SAVINGS</th>
+              <th className="px-4 py-3 font-medium">EFFORT</th>
+              <th className="px-4 py-3 font-medium">STATUS</th>
+            </tr>
+          </thead>
+          <tbody>
+            {prioritized.map((r) => (
+              <tr key={r.externalId} className="border-b border-zinc-100 last:border-0 hover:bg-zinc-50">
+                <td className="px-4 py-3">
+                  <Link href={`/optimizations/${r.externalId}`} className="font-mono text-xs hover:underline focus-visible:outline-none">
+                    {r.resourceId}
+                  </Link>
+                  <div className="text-xs text-zinc-500">{r.resourceType}</div>
+                </td>
+                <td className="px-4 py-3">
+                  <div className="font-medium">{r.actionType}</div>
+                  <div className="text-xs text-zinc-500">{r.source}</div>
+                </td>
+                <td className="px-4 py-3 font-mono text-xs">{r.region}</td>
+                <td className="px-4 py-3 text-right font-mono">${r.estimatedMonthlySavingsUsd.toFixed(2)}/mo</td>
+                <td className="px-4 py-3">
+                  <span className={`rounded-full px-2 py-1 text-xs ${r.effort === "Low" ? "bg-emerald-100 text-emerald-700" : r.effort === "Medium" ? "bg-amber-100 text-amber-700" : "bg-red-100 text-red-700"}`}>{r.effort}</span>
+                </td>
+                <td className="px-4 py-3">
+                  <span className="rounded-full bg-zinc-900 px-2 py-1 text-xs text-white">{r.status ?? "Open"}</span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="space-y-3 md:hidden">
+        {prioritized.map((r) => (
+          <Link key={r.externalId} href={`/optimizations/${r.externalId}`} className="block rounded-xl border border-zinc-200 bg-white p-4">
+            <div className="font-mono text-xs">{r.resourceId} • {r.resourceType}</div>
+            <div className="text-sm font-medium">{r.actionType}</div>
+            <div className="text-xs text-zinc-500">{r.region} • {r.source}</div>
+            <div className="mt-2 flex justify-between text-sm">
+              <span className="font-mono">${r.estimatedMonthlySavingsUsd.toFixed(2)}/mo</span>
+              <span className="rounded-full bg-zinc-900 px-2 py-1 text-xs text-white">{r.status ?? "Open"}</span>
             </div>
-            <div className="text-right">
-              <div className="text-sm font-semibold text-emerald-700">${r.estimatedMonthlySavingsUsd.toFixed(2)}/mo</div>
-              <div className="text-xs text-zinc-500">₦{convertUsdToNgn(r.estimatedMonthlySavingsUsd, fxRate).toLocaleString()} est.</div>
-              <div className="text-xs text-zinc-500">{r.savingsPercentage ? `${r.savingsPercentage}%` : "—"}</div>
-            </div>
-          </div>
-        </Link>
-      ))}
-    </div>
+          </Link>
+        ))}
+      </div>
+    </>
   );
 }
