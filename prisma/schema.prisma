@@ -79,11 +79,12 @@ model VerificationToken {
 }
 
 model Organization {
-  id        String       @id @default(cuid())
-  name      String
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
-  memberships Membership[]
+  id             String          @id @default(cuid())
+  name           String
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  memberships    Membership[]
+  activityEvents ActivityEvent[]
 
   @@map("organizations")
 }
@@ -103,4 +104,16 @@ model Membership {
   @@map("memberships")
 }
 
-// Future per docs/05: CostSnapshot/Recommendation/FxRate deferred to NG-301+
+model ActivityEvent {
+  id             String   @id @default(cuid())
+  organizationId String
+  type           String
+  title          String
+  description    String?
+  resourceId     String?
+  createdAt      DateTime @default(now())
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, createdAt])
+  @@map("activity_events")
+}
