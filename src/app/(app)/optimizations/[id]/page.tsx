@@ -9,15 +9,16 @@ import Link from "next/link";
 import { EvidenceDisplay } from "@/components/optimizations/evidence-display";
 import { AIExplanationCard } from "@/components/optimizations/ai-explanation";
 
-export default async function RecommendationDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function RecommendationDetailPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ scenario?: string }> }) {
   const { id } = await params;
+  const sp = await searchParams;
   const session = await auth();
   const userId = (session?.user as unknown as { id?: string })?.id;
   if (!userId) return <div>Unauthorized</div>;
   const membership = await prisma.membership.findFirst({ where: { userId } });
   if (!membership) return <div>No organization</div>;
 
-  const scenarioId = "balanced-startup";
+  const scenarioId = (sp.scenario as string) || "balanced-startup";
   const dataset = getDemoDataset(scenarioId);
   const optProvider = new DemoOptimizationProvider(scenarioId);
   const rec = await optProvider.getRecommendationById(id, { organizationId: membership.organizationId });
@@ -30,9 +31,10 @@ export default async function RecommendationDetailPage({ params }: { params: Pro
   const savingsNgn = convertUsdToNgn(rec.estimatedMonthlySavingsUsd, fxRate);
   const costNgn = convertUsdToNgn(rec.estimatedMonthlyCostUsd, fxRate);
 
+  const backQs = scenarioId !== "balanced-startup" ? `?scenario=${scenarioId}` : "";
   return (
     <div className="space-y-6">
-      <Link href="/optimizations" className="text-sm text-zinc-600 hover:text-black">← Back to optimizations</Link>
+      <Link href={`/optimizations${backQs}`} className="text-sm text-zinc-600 hover:text-black">← Back to optimizations</Link>
       <div>
         <h1 className="text-2xl font-semibold">{rec.resourceId} • {rec.resourceType}</h1>
         <p className="text-sm text-zinc-600">{rec.actionType} • {rec.source} • {rec.region}</p>

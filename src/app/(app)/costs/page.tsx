@@ -9,7 +9,7 @@ import { ServiceBreakdown } from "@/components/costs/service-breakdown";
 import { RegionBreakdown } from "@/components/costs/region-breakdown";
 import { PeriodComparison } from "@/components/costs/period-comparison";
 
-export default async function CostsPage({ searchParams }: { searchParams: Promise<{ period?: string }> }) {
+export default async function CostsPage({ searchParams }: { searchParams: Promise<{ period?: string; scenario?: string }> }) {
   const session = await auth();
   const userId = (session?.user as unknown as { id?: string })?.id;
   if (!userId) return <div>Unauthorized</div>;
@@ -18,7 +18,7 @@ export default async function CostsPage({ searchParams }: { searchParams: Promis
 
   const sp = await searchParams;
   const period = sp.period === "7" ? 7 : sp.period === "90" ? 90 : 30;
-  const scenarioId = "balanced-startup";
+  const scenarioId = (sp.scenario as string) || "balanced-startup";
   const dataset = getDemoDataset(scenarioId);
   const provider = new DemoCostProvider(scenarioId);
   const raw = await provider.getCosts({ organizationId: membership.organizationId, periodDays: period });
@@ -28,48 +28,52 @@ export default async function CostsPage({ searchParams }: { searchParams: Promis
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Costs</h1>
-          <p className="text-sm text-zinc-600">Detailed cost analysis • {period} days • {cost.source}</p>
+          <h1 className="font-display text-2xl font-semibold tracking-tight">Costs</h1>
+          <p className="text-sm text-stone-500">Analytical view — where cost is happening, by service and region. <span className="text-stone-400">Demo · {dataset.scenario.name}</span></p>
         </div>
-        <div className="flex gap-1 rounded-lg border border-zinc-200 p-1">
+        <div className="flex gap-1 rounded-lg border border-stone-200 bg-white p-1">
           {[7, 30, 90].map((d) => (
-            <Link key={d} href={`/costs?period=${d}`} className={`rounded-md px-3 py-1 text-sm ${period === d ? "bg-zinc-900 text-white" : "hover:bg-zinc-100"}`}>
-              {d}d
+            <Link key={d} href={`/costs?period=${d}&scenario=${scenarioId}`} className={`rounded-md px-3 py-1 text-sm ${period === d ? "bg-zinc-900 text-white" : "hover:bg-zinc-100"}`}>
+              {d}D
             </Link>
           ))}
         </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
-        <div className="rounded-xl border border-zinc-200 bg-white p-5">
-          <div className="text-xs uppercase tracking-widest text-zinc-500">Total spend</div>
-          <div className="mt-2 text-2xl font-semibold">${cost.total.toLocaleString()} <span className="text-xs text-zinc-500">{cost.currency}</span></div>
-          <div className="text-xs text-zinc-500">Freshness {new Date(cost.observedAt).toLocaleDateString()}</div>
+        <div className="rounded-2xl border border-stone-200 bg-white p-5">
+          <div className="font-mono text-xs tracking-widest text-stone-500">TOTAL SPEND</div>
+          <div className="mt-2 text-2xl font-semibold tracking-tight">${cost.total.toLocaleString()} <span className="text-xs font-normal text-stone-500">{cost.currency}</span></div>
+          <div className="text-xs text-stone-500">Source {cost.source} · Synced {new Date(cost.observedAt).toLocaleDateString()}</div>
+          <details className="mt-2 text-xs text-stone-500"><summary className="cursor-pointer">What this includes</summary><span className="mt-1 block">Aggregated daily cost over {cost.daily.length} days. Trend below shows distribution.</span></details>
         </div>
-        <div className="rounded-xl border border-zinc-200 bg-white p-5">
-          <div className="text-xs uppercase tracking-widest text-zinc-500">Estimated Naira</div>
-          <div className="mt-2 text-lg font-semibold">₦{naira.naira.toLocaleString()}</div>
-          <div className="text-xs text-zinc-500">at ₦{naira.rate.toLocaleString()}/USD • {naira.source}</div>
+        <div className="rounded-2xl border border-stone-200 bg-white p-5">
+          <div className="font-mono text-xs tracking-widest text-stone-500">ESTIMATED NAIRA</div>
+          <div className="mt-2 text-xl font-semibold">₦{naira.naira.toLocaleString()}</div>
+          <div className="text-xs text-stone-500">₦{naira.rate.toLocaleString()}/USD · {naira.source} · {new Date(fx.observedAt).toLocaleDateString()}</div>
+          <div className="mt-1 text-xs text-stone-500">Estimate — not a bank charge.</div>
         </div>
-        <div className="rounded-xl border border-zinc-200 bg-white p-5">
-          <div className="text-xs uppercase tracking-widest text-zinc-500">Period</div>
-          <div className="mt-2 text-sm">{cost.daily.length} days • Trend from {cost.daily[0]?.date} to {cost.daily[cost.daily.length - 1]?.date}</div>
+        <div className="rounded-2xl border border-stone-200 bg-white p-5">
+          <div className="font-mono text-xs tracking-widest text-stone-500">PERIOD & FRESHNESS</div>
+          <div className="mt-2 text-sm leading-5">{cost.daily.length} days · {cost.daily[0]?.date} → {cost.daily[cost.daily.length - 1]?.date}</div>
+          <div className="mt-1 text-xs text-stone-500">Click a service below to drill into its share.</div>
         </div>
       </div>
 
-      <ServiceBreakdown services={cost.services} total={cost.total} />
+      <ServiceBreakdown services={cost.services} total={cost.total} scenarioId={scenarioId} />
       <RegionBreakdown regions={cost.regions} />
       <PeriodComparison periodDays={period} />
 
-      <div className="rounded-xl border border-zinc-200 bg-white p-5">
-        <div className="text-xs uppercase tracking-widest text-zinc-500">Trend (daily)</div>
-        <div className="mt-4 flex h-32 items-end gap-[2px]">
+      <div className="rounded-2xl border border-stone-200 bg-white p-5">
+        <div className="font-mono text-xs tracking-widest text-stone-500">DAILY TREND</div>
+        <div className="text-xs text-stone-500">Bar height = daily spend relative to period max</div>
+        <div className="mt-4 flex h-32 items-end gap-[2px]" role="img" aria-label={`Daily spend trend over ${period} days`}>
           {cost.daily.map((d) => {
             const max = Math.max(...cost.daily.map((x) => x.amount));
             const h = max ? (d.amount / max) * 100 : 0;
-            return <div key={d.date} className="flex-1 rounded-t bg-zinc-900" style={{ height: `${h}%` }} title={`${d.date} $${d.amount}`} />;
+            return <div key={d.date} className="flex-1 rounded-t bg-zinc-900" style={{ height: `${h}%` }} title={`${d.date} $${d.amount.toFixed(2)}`} />;
           })}
         </div>
       </div>

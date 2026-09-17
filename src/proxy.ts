@@ -12,6 +12,7 @@ const publicRoutes = [
   "/sign-up",
   "/privacy",
   "/terms",
+  "/onboarding",
   "/api/auth",
 ];
 

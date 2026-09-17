@@ -16,11 +16,12 @@ export function Sidebar({ workspaceName, scenario, onNavigate }: { workspaceName
     <div className="flex h-full flex-col bg-[#0a0a0a] text-white">
       <div className="border-b border-zinc-800 px-5 py-4">
         <div className="font-display text-lg font-semibold tracking-tight">NairaGuard</div>
-        <div className="mt-2 rounded-md bg-zinc-900 px-3 py-2">
-          <div className="text-sm font-medium">{workspaceName}</div>
-          <div className="flex items-center gap-1.5 text-xs text-zinc-400">
-            <span className="h-2 w-2 rounded-full bg-emerald-500" />
-            Demo • {scenario}
+        <div className="mt-1 font-mono text-[10px] tracking-[0.18em] text-zinc-500">AWS FINOPS · NAIRA-AWARE</div>
+        <div className="mt-3 rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2.5">
+          <div className="text-sm font-medium leading-none">{workspaceName}</div>
+          <div className="mt-1 flex items-center gap-1.5 text-xs text-zinc-400">
+            <span className="h-2 w-2 rounded-full bg-emerald-500" aria-hidden />
+            Demo · {scenario}
           </div>
         </div>
       </div>

@@ -1,25 +1,30 @@
 @import "tailwindcss";
 
-/* NairaGuard Design System — Homepage Redesign */
+/* NairaGuard Design System — Production */
 :root {
   --background: #ffffff;
   --foreground: #0a0a0a;
-  --accent: #ff6b00;
+  --accent: #ff3b30; /* brand red — attention/selected */
   --muted: #71717a;
   --border: #e4e4e7;
   --display: "Clash Display", sans-serif;
   --body: "Satoshi", ui-sans-serif, system-ui, sans-serif;
   --mono: "JetBrains Mono", ui-monospace, monospace;
-  /* App shell — dark production */
+  /* App shell — production (§9-10): deep black nav, warm stone canvas */
+  --app-canvas: #fafaf8; /* warm off-white */
+  --app-surface: #ffffff;
+  --app-surface-muted: #f4f4f5;
+  --app-border: #e7e5e4; /* stone-200 */
+  --app-border-strong: #d6d3d1;
+  --app-text: #1c1917; /* stone-900 */
+  --app-muted: #78716c; /* stone-500 */
   --app-bg: #0a0a0a;
-  --app-surface: #18181b;
-  --app-surface-elevated: #27272a;
-  --app-border: #27272a;
-  --app-text: #fafafa;
-  --app-muted: #a1a1aa;
-  --app-accent: #ef4444; /* red per spec 42 */
-  --app-success: #22c55e;
-  --app-warning: #f59e0b;
+  --app-accent: #ff3b30;
+  --app-success: #16a34a;
+  --app-warning: #d97706;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
 }
 
 @theme inline {
