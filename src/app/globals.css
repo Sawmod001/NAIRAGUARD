@@ -10,6 +10,16 @@
   --display: "Clash Display", sans-serif;
   --body: "Satoshi", ui-sans-serif, system-ui, sans-serif;
   --mono: "JetBrains Mono", ui-monospace, monospace;
+  /* App shell — dark production */
+  --app-bg: #0a0a0a;
+  --app-surface: #18181b;
+  --app-surface-elevated: #27272a;
+  --app-border: #27272a;
+  --app-text: #fafafa;
+  --app-muted: #a1a1aa;
+  --app-accent: #ef4444; /* red per spec 42 */
+  --app-success: #22c55e;
+  --app-warning: #f59e0b;
 }
 
 @theme inline {
