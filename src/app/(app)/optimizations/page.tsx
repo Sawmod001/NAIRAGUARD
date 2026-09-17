@@ -7,7 +7,7 @@ export default async function OptimizationsPage({ searchParams }: { searchParams
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Optimizations</h1>
-        <p className="text-sm text-zinc-600">High-value opportunities • deterministic filter/sort</p>
+        <p className="text-sm text-zinc-600">Find and review opportunities to reduce cloud waste.</p>
       </div>
       <OptimizationFilters />
       <OptimizationList searchParams={sp} />
