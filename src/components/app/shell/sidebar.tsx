@@ -29,7 +29,7 @@ export function Sidebar({ workspaceName, scenario, onNavigate }: { workspaceName
       <div className="flex-1 overflow-y-auto px-3 py-4">
         {nav.map((sec) => (
           <div key={sec.section} className="mb-6">
-            <div className="px-3 py-1 font-mono text-[11px] tracking-widest text-zinc-500">{sec.section}</div>
+            <div className="px-3 py-1 font-mono text-[11px] tracking-[0.08em] text-zinc-500">{sec.section}</div>
             <div className="mt-1 space-y-1">
               {sec.items.map((it) => {
                 const active = pathname === it.href || pathname.startsWith(it.href + "/");
@@ -38,7 +38,7 @@ export function Sidebar({ workspaceName, scenario, onNavigate }: { workspaceName
                     key={it.href}
                     href={it.href}
                     onClick={onNavigate}
-                    className={`block rounded-md px-3 py-2 text-sm ${active ? "bg-zinc-800 text-white" : "text-zinc-400 hover:bg-zinc-900 hover:text-white"}`}
+                    className={`relative block rounded-[6px] px-3 py-2 text-sm ${active ? "bg-[#1a1a1e] text-white before:absolute before:left-0 before:top-1 before:bottom-1 before:w-[3px] before:rounded-full before:bg-[#E8622C]" : "text-zinc-400 hover:bg-zinc-900 hover:text-white"}`}
                   >
                     {it.label}
                   </Link>
