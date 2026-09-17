@@ -4,24 +4,27 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma/client";
 import Link from "next/link";
 
-export default async function ResourceDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function ResourceDetailPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ scenario?: string }> }) {
   const { id } = await params;
+  const sp = await searchParams;
+  const scenarioId = (sp.scenario as string) || "balanced-startup";
   const session = await auth();
   const userId = (session?.user as unknown as { id?: string })?.id;
   const membership = userId ? await prisma.membership.findFirst({ where: { userId } }) : null;
   if (!membership) return <div>Unauthorized</div>;
 
-  const rp = new DemoResourceProvider("balanced-startup");
+  const rp = new DemoResourceProvider(scenarioId);
   const resource = await rp.getResource({ organizationId: membership.organizationId, resourceId: id });
   if (!resource) return <div className="p-6">Resource not found</div>;
 
-  const op = new DemoOptimizationProvider("balanced-startup");
+  const op = new DemoOptimizationProvider(scenarioId);
   const recs = await op.getRecommendations({ organizationId: membership.organizationId });
   const rec = recs.find((r) => r.resourceId === id);
 
+  const qs = scenarioId !== "balanced-startup" ? `?scenario=${scenarioId}` : "";
   return (
     <div className="space-y-6">
-      <Link href="/costs" className="text-sm text-zinc-500 hover:text-black">← Costs</Link>
+      <Link href={`/costs${qs}`} className="text-sm text-stone-500 hover:text-stone-900">← Costs</Link>
       <div>
         <h1 className="font-display text-2xl font-semibold tracking-tight">{resource.resourceId} • {resource.resourceType}</h1>
         <p className="text-sm text-zinc-500">{resource.region} • {resource.resourceArn}</p>
@@ -42,7 +45,7 @@ export default async function ResourceDetailPage({ params }: { params: Promise<{
           <div className="font-mono text-xs tracking-widest text-orange-700">OPTIMIZATION OPPORTUNITY</div>
           <div className="mt-2 text-sm font-medium">{rec.actionType} → {rec.recommendedConfiguration}</div>
           <div className="text-sm">Potential savings ${rec.estimatedMonthlySavingsUsd.toFixed(2)}/mo • {rec.effort} effort • {rec.restartRequired ? "restart" : "no restart"}</div>
-          <Link href={`/optimizations/${rec.externalId}`} className="mt-3 inline-block rounded-full bg-black px-4 py-2 text-sm font-medium text-white">View recommendation</Link>
+          <Link href={`/optimizations/${rec.externalId}${qs}`} className="mt-3 inline-block rounded-full bg-black px-4 py-2 text-sm font-medium text-white">View recommendation</Link>
         </div>
       ) : (
         <div className="text-sm text-zinc-500">No optimization for this resource</div>
