@@ -36,7 +36,7 @@ export function HeroNew() {
             AWS bills arrive in dollars. Your business plans in naira. NairaGuard connects the two — giving you a clearer view of cloud spend, optimization opportunities, and their estimated Naira equivalent.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
-            <a href="/sign-up" className="rounded-full bg-white px-5 py-3 text-sm font-semibold text-black hover:bg-zinc-100">Explore the Demo</a>
+            <a href="/onboarding" className="rounded-full bg-white px-5 py-3 text-sm font-semibold text-black hover:bg-zinc-100">Explore the Demo</a>
             <a href="#how" className="rounded-full border border-zinc-700 px-5 py-3 text-sm font-medium hover:bg-zinc-900">See how it works</a>
           </div>
           <div className="mt-3 font-mono text-xs tracking-wide text-zinc-500">Demo Mode · No AWS account required</div>

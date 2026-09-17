@@ -15,21 +15,21 @@ export function OptimizationFilters() {
 
   return (
     <div className="flex flex-wrap gap-2">
-      <select defaultValue={params.get("effort") ?? ""} onChange={(e) => set("effort", e.target.value)} className="rounded-md border border-zinc-200 px-2 py-1 text-sm">
+      <select aria-label="Filter by effort" defaultValue={params.get("effort") ?? ""} onChange={(e) => set("effort", e.target.value)} className="rounded-lg border border-stone-200 bg-white px-3 py-1.5 text-sm">
         <option value="">All effort</option>
         <option value="Low">Low</option>
         <option value="Medium">Medium</option>
         <option value="High">High</option>
       </select>
-      <select defaultValue={params.get("region") ?? ""} onChange={(e) => set("region", e.target.value)} className="rounded-md border border-zinc-200 px-2 py-1 text-sm">
+      <select aria-label="Filter by region" defaultValue={params.get("region") ?? ""} onChange={(e) => set("region", e.target.value)} className="rounded-lg border border-stone-200 bg-white px-3 py-1.5 text-sm">
         <option value="">All regions</option>
         <option value="eu-west-1">eu-west-1</option>
         <option value="us-east-1">us-east-1</option>
       </select>
-      <select defaultValue={params.get("sort") ?? "savings"} onChange={(e) => set("sort", e.target.value)} className="rounded-md border border-zinc-200 px-2 py-1 text-sm">
+      <select aria-label="Sort" defaultValue={params.get("sort") ?? "savings"} onChange={(e) => set("sort", e.target.value)} className="rounded-lg border border-stone-200 bg-white px-3 py-1.5 text-sm">
         <option value="savings">Highest savings</option>
         <option value="percentage">Savings %</option>
-        <option value="effort">Effort</option>
+        <option value="effort">Lowest effort</option>
       </select>
     </div>
   );

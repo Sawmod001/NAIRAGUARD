@@ -24,7 +24,7 @@ export function Find() {
           <div className="grid gap-4 text-sm">
             <div className="rounded-xl border border-black/10 bg-white p-5">Rightsizing • Idle • Storage • Commitment — evidence from Cost Optimization Hub / Compute Optimizer</div>
             <div className="rounded-xl border border-black/10 bg-white p-5">Effort Low • Medium • High • Restart required • Rollback possible • Deterministic</div>
-            <a href="/optimizations" className="rounded-full bg-black px-5 py-3 text-center text-sm font-medium text-white hover:bg-zinc-900">Inspect an opportunity</a>
+            <a href="/onboarding" className="rounded-full bg-black px-5 py-3 text-center text-sm font-medium text-white hover:bg-zinc-900">Inspect an opportunity</a>
           </div>
         </div>
       </div>

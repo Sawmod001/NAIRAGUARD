@@ -11,14 +11,14 @@ import Link from "next/link";
  * Each rec: resource, type, savings USD/NGN, effort, impact (savings%), risk (restart/rollback), status, priority
  */
 
-export async function OptimizationList({ searchParams }: { searchParams?: { effort?: string; region?: string; sort?: string } }) {
+export async function OptimizationList({ searchParams }: { searchParams?: { effort?: string; region?: string; sort?: string; scenario?: string } }) {
   const session = await auth();
   const userId = (session?.user as unknown as { id?: string })?.id;
   if (!userId) return <div>Unauthorized</div>;
   const membership = await prisma.membership.findFirst({ where: { userId } });
   if (!membership) return <div>No organization</div>;
 
-  const scenarioId = "balanced-startup";
+  const scenarioId = (searchParams?.scenario as string) || "balanced-startup";
   const dataset = getDemoDataset(scenarioId);
   const provider = new DemoOptimizationProvider(scenarioId);
   let recs;
@@ -51,10 +51,11 @@ export async function OptimizationList({ searchParams }: { searchParams?: { effo
   }
   const fxRate = dataset.fx.usdNgn;
 
+  const scenarioQs = scenarioId !== "balanced-startup" ? `&scenario=${scenarioId}` : "";
   // Production table — dense, sticky header, right-aligned monetary, keyboard accessible; stacked on mobile
   return (
     <>
-      <div className="hidden overflow-x-auto rounded-xl border border-zinc-200 bg-white md:block">
+      <div className="hidden overflow-x-auto rounded-xl border border-stone-200 bg-white md:block">
         <table className="w-full text-sm">
           <thead className="sticky top-0 bg-zinc-50">
             <tr className="border-b border-zinc-200 text-left font-mono text-xs tracking-widest text-zinc-500">
@@ -70,7 +71,7 @@ export async function OptimizationList({ searchParams }: { searchParams?: { effo
             {prioritized.map((r) => (
               <tr key={r.externalId} className="border-b border-zinc-100 last:border-0 hover:bg-zinc-50">
                 <td className="px-4 py-3">
-                  <Link href={`/optimizations/${r.externalId}`} className="font-mono text-xs hover:underline focus-visible:outline-none">
+                  <Link href={`/optimizations/${r.externalId}${scenarioQs ? `?scenario=${scenarioId}` : ""}`} className="font-mono text-xs hover:underline focus-visible:outline-none">
                     {r.resourceId}
                   </Link>
                   <div className="text-xs text-zinc-500">{r.resourceType}</div>
@@ -94,7 +95,7 @@ export async function OptimizationList({ searchParams }: { searchParams?: { effo
       </div>
       <div className="space-y-3 md:hidden">
         {prioritized.map((r) => (
-          <Link key={r.externalId} href={`/optimizations/${r.externalId}`} className="block rounded-xl border border-zinc-200 bg-white p-4">
+          <Link key={r.externalId} href={`/optimizations/${r.externalId}${scenarioQs ? `?scenario=${scenarioId}` : ""}`} className="block rounded-xl border border-stone-200 bg-white p-4">
             <div className="font-mono text-xs">{r.resourceId} • {r.resourceType}</div>
             <div className="text-sm font-medium">{r.actionType}</div>
             <div className="text-xs text-zinc-500">{r.region} • {r.source}</div>

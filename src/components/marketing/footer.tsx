@@ -14,7 +14,7 @@ export function Footer() {
               <a href="/dashboard" className="block hover:text-white">Dashboard</a>
               <a href="/costs" className="block hover:text-white">Costs</a>
               <a href="/optimizations" className="block hover:text-white">Optimizations</a>
-              <a href="/sign-up" className="block hover:text-white">Demo</a>
+              <a href="/onboarding" className="block hover:text-white">Demo</a>
             </div>
           </div>
           <div>

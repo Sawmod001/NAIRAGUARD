@@ -17,7 +17,7 @@ export function Navbar() {
           <a href="#demo" className="text-zinc-300 hover:text-white">Demo</a>
           <a href="#why" className="text-zinc-300 hover:text-white">Why NairaGuard</a>
           <a href="/sign-in" className="text-zinc-300 hover:text-white">Sign in</a>
-          <a href="/sign-up" className="rounded-full bg-white px-4 py-2 font-medium text-black hover:bg-zinc-100">Try Demo</a>
+          <a href="/onboarding" className="rounded-full bg-white px-4 py-2 font-medium text-black hover:bg-zinc-100">Try Demo</a>
         </nav>
         <button onClick={() => setOpen((v) => !v)} aria-expanded={open} aria-label="Toggle menu" className="rounded-md border border-zinc-700 px-3 py-1.5 text-sm md:hidden">
           Menu
@@ -30,7 +30,7 @@ export function Navbar() {
             <a href="#how" onClick={() => setOpen(false)}>How it works</a>
             <a href="#demo" onClick={() => setOpen(false)}>Demo</a>
             <a href="/sign-in">Sign in</a>
-            <a href="/sign-up" className="rounded-full bg-white px-4 py-2 text-center font-medium text-black">Try Demo</a>
+            <a href="/onboarding" className="rounded-full bg-white px-4 py-2 text-center font-medium text-black">Try Demo</a>
           </nav>
         </div>
       )}

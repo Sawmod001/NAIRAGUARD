@@ -33,45 +33,46 @@ export async function AIExplanationCard({ rec, fxRate }: { rec: NormalizedRecomm
     });
 
     return (
-      <div className="rounded-xl border border-violet-200 bg-violet-50 p-5">
-        <div className="text-xs font-semibold uppercase tracking-widest text-violet-700">AI explanation • Mock • Grounded in evidence</div>
-        <div className="mt-2 text-sm font-medium">{explanation.summary}</div>
-        <div className="mt-2 text-sm">{explanation.whyItMatters}</div>
-        <div className="mt-3">
-          <div className="text-xs font-semibold text-violet-700">Why it matters</div>
-          <div className="text-sm">{explanation.whyItMatters}</div>
-        </div>
-        <div className="mt-2">
-          <div className="text-xs font-semibold text-violet-700">Recommended next step</div>
-          <div className="text-sm">{explanation.recommendedNextStep}</div>
-        </div>
-        <div className="mt-2 grid gap-2 md:grid-cols-2">
+      <div className="rounded-2xl border border-stone-200 bg-white p-6">
+        <div className="font-mono text-xs tracking-widest text-stone-500">AI EXPLANATION · MOCK · GROUNDED IN EVIDENCE</div>
+        <div className="mt-2 text-sm font-medium leading-6">{explanation.summary}</div>
+        <div className="mt-2 text-sm leading-6 text-stone-600">AI explains the evidence below. It does not invent savings — USD values are deterministic above.</div>
+        <div className="mt-4 grid gap-4 md:grid-cols-2">
           <div>
-            <div className="text-xs font-semibold text-violet-700">Business impact</div>
-            <div className="text-sm">{explanation.businessImpact}</div>
+            <div className="font-mono text-xs tracking-widest text-stone-500">WHY IT MATTERS</div>
+            <div className="mt-1 text-sm leading-6">{explanation.whyItMatters}</div>
           </div>
           <div>
-            <div className="text-xs font-semibold text-violet-700">Technical impact</div>
-            <div className="text-sm">{explanation.technicalImpact}</div>
+            <div className="font-mono text-xs tracking-widest text-stone-500">NEXT STEP</div>
+            <div className="mt-1 text-sm leading-6">{explanation.recommendedNextStep}</div>
           </div>
         </div>
-        <div className="mt-2">
-          <div className="text-xs font-semibold text-violet-700">Risks</div>
-          <ul className="list-disc pl-5 text-sm">
+        <div className="mt-4 grid gap-4 md:grid-cols-2">
+          <div>
+            <div className="font-mono text-xs tracking-widest text-stone-500">BUSINESS IMPACT</div>
+            <div className="mt-1 text-sm leading-6">{explanation.businessImpact}</div>
+          </div>
+          <div>
+            <div className="font-mono text-xs tracking-widest text-stone-500">TECHNICAL IMPACT</div>
+            <div className="mt-1 text-sm leading-6">{explanation.technicalImpact}</div>
+          </div>
+        </div>
+        <div className="mt-4">
+          <div className="font-mono text-xs tracking-widest text-stone-500">RISKS</div>
+          <ul className="list-disc pl-5 text-sm leading-6 text-stone-700">
             {explanation.risks.map((r, i) => (
               <li key={i}>{r}</li>
             ))}
           </ul>
         </div>
-        <div className="mt-2 text-xs text-violet-700">Priority {explanation.priority} • Confidence {explanation.confidence} • Assumptions: {explanation.assumptions.join("; ")}</div>
+        <div className="mt-4 text-xs text-stone-500">Priority {explanation.priority} · Confidence {explanation.confidence} · Assumptions: {explanation.assumptions.join("; ")}</div>
       </div>
     );
   } catch (e: unknown) {
-    // Graceful failure — deterministic savings still visible via parent page
     return (
-      <div className="rounded-xl border border-amber-200 bg-amber-50 p-5">
-        <div className="text-xs font-semibold uppercase tracking-widest text-amber-700">AI explanation unavailable</div>
-        <div className="mt-1 text-sm text-amber-700">Could not generate AI explanation. Your deterministic savings remain visible. Try again.</div>
+      <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5">
+        <div className="font-mono text-xs tracking-widest text-amber-700">AI EXPLANATION UNAVAILABLE</div>
+        <div className="mt-1 text-sm text-amber-700">Could not generate explanation. Deterministic savings above remain authoritative. Retry.</div>
         <div className="mt-1 text-xs text-amber-700">{e instanceof Error ? e.message : "Unknown error"}</div>
       </div>
     );

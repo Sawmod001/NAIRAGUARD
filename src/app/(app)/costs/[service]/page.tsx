@@ -15,23 +15,26 @@ function slugToService(slug: string): string {
   return map[slug] ?? decodeURIComponent(slug);
 }
 
-export default async function ServiceDetailPage({ params }: { params: Promise<{ service: string }> }) {
+export default async function ServiceDetailPage({ params, searchParams }: { params: Promise<{ service: string }>; searchParams: Promise<{ scenario?: string }> }) {
   const { service: slug } = await params;
+  const sp = await searchParams;
+  const scenarioId = (sp.scenario as string) || "balanced-startup";
   const serviceName = slugToService(slug);
   const session = await auth();
   const userId = (session?.user as unknown as { id?: string })?.id;
   const membership = userId ? await prisma.membership.findFirst({ where: { userId } }) : null;
   if (!membership) return <div>Unauthorized</div>;
 
-  const provider = new DemoCostProvider("balanced-startup");
+  const provider = new DemoCostProvider(scenarioId);
   const raw = await provider.getCosts({ organizationId: membership.organizationId });
   const cost = normalizeCostResult(raw);
   const svc = cost.services.find((s) => s.service === serviceName);
   if (!svc) return <div className="p-6">Service not found: {serviceName}</div>;
 
+  const qs = scenarioId !== "balanced-startup" ? `?scenario=${scenarioId}` : "";
   return (
     <div className="space-y-6">
-      <Link href="/costs" className="text-sm text-zinc-500 hover:text-black">← Costs</Link>
+      <Link href={`/costs${qs}`} className="text-sm text-stone-500 hover:text-stone-900">← Costs</Link>
       <div>
         <h1 className="font-display text-2xl font-semibold tracking-tight">Costs / {serviceName.replace("Amazon ", "")}</h1>
         <p className="text-sm text-zinc-500">Service detail • {svc.percentage.toFixed(1)}% of total • ${svc.amount.toFixed(2)}</p>
@@ -76,7 +79,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
           </thead>
           <tbody>
             <tr className="border-b border-zinc-100 hover:bg-zinc-50">
-              <td className="py-2"><Link href="/costs/resource/i-0demo001" className="font-mono text-xs hover:underline">i-0demo001</Link></td>
+              <td className="py-2"><Link href={`/costs/resource/i-0demo001${qs}`} className="font-mono text-xs hover:underline">i-0demo001</Link></td>
               <td className="py-2">m6i.2xlarge</td>
               <td className="py-2">eu-west-1</td>
               <td className="py-2 text-right">$285.40</td>

@@ -24,13 +24,13 @@ export function AppShell({ workspaceName, scenario, children }: { workspaceName:
 
       <div className="md:pl-[260px]">
         <div className="sticky top-0 z-10 flex items-center gap-3 border-b border-zinc-800 bg-[#0a0a0a] px-6 py-3 md:hidden">
-          <button onClick={() => setOpen((v) => !v)} aria-label="Toggle menu" className="rounded-md border border-zinc-700 px-3 py-1.5 text-sm">
+          <button onClick={() => setOpen((v) => !v)} aria-label="Toggle menu" className="rounded-lg border border-zinc-700 px-3 py-1.5 text-sm text-white">
             Menu
           </button>
-          <span className="font-display font-semibold">NairaGuard</span>
+          <span className="font-display font-semibold text-white">NairaGuard</span>
           <span className="ml-auto text-xs text-zinc-400">{workspaceName}</span>
         </div>
-        <div className="bg-zinc-50 text-zinc-900 min-h-[calc(100vh-57px)]">{children}</div>
+        <div className="bg-[#fafaf8] text-stone-900 min-h-[calc(100vh-57px)]">{children}</div>
       </div>
     </div>
   );
