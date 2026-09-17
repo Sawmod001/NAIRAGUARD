@@ -1,10 +1,12 @@
 "use server";
 
 import bcrypt from "bcryptjs";
+import { headers } from "next/headers";
 import { signUpSchema } from "@/schemas/auth";
 import { prisma } from "@/lib/prisma/client";
 import { AppError } from "@/lib/errors/app-error";
 import { ErrorCode } from "@/lib/errors/codes";
+import { checkRateLimit, RatePresets } from "@/lib/rate-limit";
 
 /**
  * Sign-up server action — NG-101 Real Prod
@@ -14,6 +16,14 @@ import { ErrorCode } from "@/lib/errors/codes";
  */
 
 export async function signUp(raw: unknown): Promise<{ ok: true; userId: string } | { ok: false; error: string; field?: string }> {
+  // Rate limit per IP on sign-up (§2)
+  try {
+    const h = await headers();
+    const ip = h.get("x-forwarded-for")?.split(",")[0]?.trim() ?? h.get("x-real-ip") ?? "unknown";
+    const rl = checkRateLimit(`action:signUp:${ip}`, RatePresets.auth.limit, RatePresets.auth.windowMs);
+    if (!rl.allowed) return { ok: false, error: "Too many attempts. Please wait and try again." };
+  } catch {}
+
   const parsed = signUpSchema.safeParse(raw);
   if (!parsed.success) {
     const first = parsed.error.issues[0];

@@ -41,9 +41,5 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   // Demo scenario — later from org preference, for now Balanced Startup
   const scenario = "Balanced Startup";
 
-  return (
-    <AppShell workspaceName={workspaceName} scenario={scenario}>
-      <div className="mx-auto max-w-[1280px] p-6 md:p-8">{children}</div>
-    </AppShell>
-  );
+  return <AppShell workspaceName={workspaceName} scenario={scenario}>{children}</AppShell>;
 }
