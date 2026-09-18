@@ -9,7 +9,6 @@ import { clientEnvSchema, type ClientEnv } from "@/schemas/env";
 function getClientEnv(): ClientEnv {
   // Client bundle only sees NEXT_PUBLIC_ vars; process.env on client is replaced at build.
   const raw: Record<string, string | undefined> = {
-    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
   };
   const parsed = clientEnvSchema.safeParse(raw);
