@@ -43,6 +43,15 @@
   --font-display: var(--display);
   --font-sans: var(--body);
   --font-mono: var(--mono);
+  /* shadcn mapping to TTD tokens — single source */
+  --card: var(--panel);
+  --card-foreground: var(--ink);
+  --border: var(--line);
+  --muted-foreground: var(--ink-muted);
+  --primary: var(--accent);
+  --primary-foreground: var(--panel);
+  --destructive: var(--destructive);
+  --radius: 8px;
 }
 
 body {
