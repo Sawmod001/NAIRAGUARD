@@ -1,4 +1,5 @@
 "use client";
+// NG-HOME-03 audit: interval respects prefers-reduced-motion, no ScrollTrigger pinned sections (0/1 allowed)
 
 import { useEffect, useState } from "react";
 
