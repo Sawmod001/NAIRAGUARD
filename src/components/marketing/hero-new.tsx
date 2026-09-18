@@ -22,7 +22,7 @@ export function HeroNew() {
 
   return (
     <section className="bg-black text-white">
-      <div className="mx-auto grid max-w-[1280px] gap-8 px-6 py-14 md:grid-cols-[1.15fr_0.85fr] md:py-20">
+      <div className="mx-auto grid max-w-[1280px] gap-8 px-6 py-12 md:grid-cols-[1.15fr_0.85fr] md:py-20">
         <div>
           <div className="font-mono text-xs tracking-[0.2em] text-zinc-400">AWS FINOPS / BUILT FOR NAIRA-AWARE TEAMS</div>
           <h1 className="font-display mt-4 text-[clamp(32px,6vw,64px)] font-semibold leading-[0.9] tracking-[-0.04em]">
