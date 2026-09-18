@@ -9,6 +9,7 @@ import { prioritizeRecommendations } from "@/domain/optimizations";
 import { getDemoDataset } from "@/infrastructure/providers/demo/registry";
 import { dashboardQuerySchema } from "@/schemas/query";
 import { PanelErrorBoundary } from "@/components/ui/panel-error-boundary";
+import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { CountUp } from "@/components/dashboard/count-up";
 import { SpendChart } from "@/components/dashboard/spend-chart";
 import Link from "next/link";
@@ -62,45 +63,53 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
           </div>
         </div>
 
-        {/* KPI row — 1col <480, 2x2 tablet, 4col desktop */}
+        {/* KPI row — hierarchy via position/size, not identical boxes */}
         <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
           <PanelErrorBoundary label="AWS SPEND">
-            <div className={panel}>
-              <div className="font-mono text-xs tracking-widest text-[#6B6B6E]">AWS SPEND</div>
-              <div className="mt-2 text-[30px] font-semibold leading-none tracking-tight text-[#0E0E0F] tabular-nums"><CountUp value={cost.total} prefix="$" /></div>
-              <div className="mt-1 flex items-center gap-1 text-xs text-[#6B6B6E]"><span className="tabular-nums">{period} days · {cost.currency}</span><span className="inline-flex items-center gap-1 rounded bg-[#FCEBE3] px-1.5 py-0.5 text-[#E8622C]">↑ {prevDelta} vs previous</span></div>
-              <details className="mt-2 text-xs text-[#6B6B6E]"><summary className="cursor-pointer text-[#E8622C] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E8622C]">What this means</summary><span className="mt-1 block">Sum of daily spend from the provider — source truth for {period} days.</span></details>
-            </div>
+            <Card>
+              <CardTitle>AWS SPEND</CardTitle>
+              <CardContent>
+                <div className="mt-2 text-[30px] font-semibold leading-none tracking-tight text-[#0E0E0F] tabular-nums"><CountUp value={cost.total} prefix="$" /></div>
+                <div className="mt-1 flex items-center gap-1 text-xs text-[#6B6B6E]"><span className="tabular-nums">{period} days · {cost.currency}</span><span className="inline-flex items-center gap-1 rounded bg-[#FCEBE3] px-1.5 py-0.5 text-[#E8622C]">↑ {prevDelta} vs previous</span></div>
+                <details className="mt-2 text-xs text-[#6B6B6E]"><summary className="cursor-pointer text-[#E8622C] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E8622C]">What this means</summary><span className="mt-1 block">Sum of daily spend from the provider — source truth for {period} days.</span></details>
+              </CardContent>
+            </Card>
           </PanelErrorBoundary>
 
           <PanelErrorBoundary label="ESTIMATED NAIRA">
-            <div className={panel}>
-              <div className="flex items-center justify-between">
-                <div className="font-mono text-xs tracking-widest text-[#6B6B6E]">ESTIMATED NAIRA EQUIVALENT</div>
-                <span className="inline-flex items-center gap-1 rounded-full border border-[#E7E5E2] px-2 py-0.5 text-[11px] text-[#6B6B6E]"><span className={`h-1.5 w-1.5 rounded-full ${fxAgeDays <= 2 ? "bg-emerald-500" : "bg-amber-500"}`} /> FX updated {fxAgeDays}d ago</span>
-              </div>
-              <div className="mt-2 text-[30px] font-semibold leading-none tracking-tight text-[#0E0E0F] tabular-nums"><CountUp value={totalNgn.naira} prefix="₦" /></div>
-              <div className="text-xs text-[#6B6B6E]">at ₦{fx.rate.toLocaleString()}/USD · {new Date(fx.observedAt).toLocaleDateString()} · {fx.source}</div>
-              <details className="mt-2 text-xs text-[#6B6B6E]"><summary className="cursor-pointer text-[#E8622C] hover:underline">How calculated</summary><span className="mt-1 block">${cost.total.toLocaleString()} × ₦{fx.rate.toLocaleString()} = ₦{totalNgn.naira.toLocaleString()} · Estimate, not a bank charge.</span></details>
-            </div>
+            <Card>
+              <CardTitle>ESTIMATED NAIRA EQUIVALENT</CardTitle>
+              <CardContent>
+                <div className="flex items-center justify-between">
+                  <span className="inline-flex items-center gap-1 rounded-full border border-[#E7E5E2] px-2 py-0.5 text-[11px] text-[#6B6B6E]"><span className={`h-1.5 w-1.5 rounded-full ${fxAgeDays <= 2 ? "bg-emerald-500" : "bg-amber-500"}`} /> FX updated {fxAgeDays}d ago</span>
+                </div>
+                <div className="mt-2 text-[30px] font-semibold leading-none tracking-tight text-[#0E0E0F] tabular-nums"><CountUp value={totalNgn.naira} prefix="₦" /></div>
+                <div className="text-xs text-[#6B6B6E]">at ₦{fx.rate.toLocaleString()}/USD · {new Date(fx.observedAt).toLocaleDateString()} · {fx.source}</div>
+                <details className="mt-2 text-xs text-[#6B6B6E]"><summary className="cursor-pointer text-[#E8622C] hover:underline">How calculated</summary><span className="mt-1 block">${cost.total.toLocaleString()} × ₦{fx.rate.toLocaleString()} = ₦{totalNgn.naira.toLocaleString()} · Estimate, not a bank charge.</span></details>
+              </CardContent>
+            </Card>
           </PanelErrorBoundary>
 
           <PanelErrorBoundary label="POTENTIAL SAVINGS">
-            <div className={`${panel} border-t-2 border-t-[#E8622C]`}>
-              <div className="font-mono text-xs tracking-widest text-[#6B6B6E]">POTENTIAL MONTHLY SAVINGS</div>
-              <div className="mt-2 text-[30px] font-semibold leading-none tracking-tight text-[#E8622C] tabular-nums">${savingsAgg.totalSavingsUsd.toFixed(2)}/mo</div>
-              <div className="text-xs text-[#6B6B6E]">₦{savingsNgn.naira.toLocaleString()}/mo est. · {recs.length} opportunities</div>
-              <details className="mt-2 text-xs text-[#6B6B6E]"><summary className="cursor-pointer text-[#E8622C] hover:underline">What this means</summary><span className="mt-1 block">Estimated savings from recommendations below — not guaranteed. Validate before implementing.</span></details>
-            </div>
+            <Card className="border-t-2 border-t-[#E8622C]">
+              <CardTitle>POTENTIAL MONTHLY SAVINGS</CardTitle>
+              <CardContent>
+                <div className="mt-2 text-[30px] font-semibold leading-none tracking-tight text-[#E8622C] tabular-nums">${savingsAgg.totalSavingsUsd.toFixed(2)}/mo</div>
+                <div className="text-xs text-[#6B6B6E]">₦{savingsNgn.naira.toLocaleString()}/mo est. · {recs.length} opportunities</div>
+                <details className="mt-2 text-xs text-[#6B6B6E]"><summary className="cursor-pointer text-[#E8622C] hover:underline">What this means</summary><span className="mt-1 block">Estimated savings from recommendations below — not guaranteed. Validate before implementing.</span></details>
+              </CardContent>
+            </Card>
           </PanelErrorBoundary>
 
           <PanelErrorBoundary label="OPPORTUNITIES">
-            <div className={panel}>
-              <div className="font-mono text-xs tracking-widest text-[#6B6B6E]">OPTIMIZATION OPPORTUNITIES</div>
-              <div className="mt-2 text-[30px] font-semibold leading-none tracking-tight text-[#0E0E0F] tabular-nums"><CountUp value={recs.length} /></div>
-              <div className="text-xs text-[#6B6B6E]">{prioritized.filter((r) => r.effort === "Low").length} low effort · {prioritized.filter((r) => r.effort !== "Low").length} review</div>
-              <details className="mt-2 text-xs text-[#6B6B6E]"><summary className="cursor-pointer text-[#E8622C] hover:underline">Why it matters</summary><span className="mt-1 block">Low-effort items are fastest to validate and drive quick wins.</span></details>
-            </div>
+            <Card>
+              <CardTitle>OPTIMIZATION OPPORTUNITIES</CardTitle>
+              <CardContent>
+                <div className="mt-2 text-[30px] font-semibold leading-none tracking-tight text-[#0E0E0F] tabular-nums"><CountUp value={recs.length} /></div>
+                <div className="text-xs text-[#6B6B6E]">{prioritized.filter((r) => r.effort === "Low").length} low effort · {prioritized.filter((r) => r.effort !== "Low").length} review</div>
+                <details className="mt-2 text-xs text-[#6B6B6E]"><summary className="cursor-pointer text-[#E8622C] hover:underline">Why it matters</summary><span className="mt-1 block">Low-effort items are fastest to validate and drive quick wins.</span></details>
+              </CardContent>
+            </Card>
           </PanelErrorBoundary>
         </div>
 
