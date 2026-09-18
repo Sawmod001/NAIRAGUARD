@@ -1,4 +1,5 @@
 "use client";
+// NG-HOME-03 audit: interval respects prefers-reduced-motion, no ScrollTrigger pinned sections (0/1 allowed)
 
 import { useEffect, useState } from "react";
 
@@ -22,7 +23,7 @@ export function HeroNew() {
 
   return (
     <section className="bg-black text-white">
-      <div className="mx-auto grid max-w-[1280px] gap-8 px-6 py-14 md:grid-cols-[1.15fr_0.85fr] md:py-20">
+      <div className="mx-auto grid max-w-[1280px] gap-8 px-6 py-12 md:grid-cols-[1.15fr_0.85fr] md:py-20">
         <div>
           <div className="font-mono text-xs tracking-[0.2em] text-zinc-400">AWS FINOPS / BUILT FOR NAIRA-AWARE TEAMS</div>
           <h1 className="font-display mt-4 text-[clamp(32px,6vw,64px)] font-semibold leading-[0.9] tracking-[-0.04em]">
@@ -33,10 +34,10 @@ export function HeroNew() {
             <span className="block font-light text-zinc-300">means in naira.</span>
           </h1>
           <p className="mt-4 max-w-xl text-[15px] leading-6 text-zinc-400">
-            AWS bills arrive in dollars. Your business plans in naira. NairaGuard connects the two — giving you a clearer view of cloud spend, optimization opportunities, and their estimated Naira equivalent.
+            AWS bills arrive in dollars. Your business plans in naira. NairaGuard connects the two — helping teams see what is driving cloud spend, identify optimization opportunities, and understand their estimated Naira impact.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
-            <a href="/onboarding" className="rounded-full bg-white px-5 py-3 text-sm font-semibold text-black hover:bg-zinc-100">Explore the Demo</a>
+            <a href="/onboarding" className="rounded-full bg-white px-5 py-3 text-sm font-semibold text-black hover:bg-zinc-100">Try Demo</a>
             <a href="#how" className="rounded-full border border-zinc-700 px-5 py-3 text-sm font-medium hover:bg-zinc-900">See how it works</a>
           </div>
           <div className="mt-3 font-mono text-xs tracking-wide text-zinc-500">Demo Mode · No AWS account required</div>

@@ -13,8 +13,8 @@ const nav = [
 export function Sidebar({ workspaceName, scenario, onNavigate }: { workspaceName: string; scenario: string; onNavigate?: () => void }) {
   const pathname = usePathname();
   return (
-    <div className="flex h-full flex-col bg-[#0a0a0a] text-white">
-      <div className="border-b border-zinc-800 px-5 py-4">
+    <div className="flex h-full flex-col bg-[#0E0E0F] text-white">
+        <div className="border-b border-zinc-800 bg-[#0E0E0F] px-5 py-4">
         <div className="font-display text-lg font-semibold tracking-tight">NairaGuard</div>
         <div className="mt-1 font-mono text-[10px] tracking-[0.18em] text-zinc-500">AWS FINOPS · NAIRA-AWARE</div>
         <div className="mt-3 rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2.5">
@@ -38,7 +38,7 @@ export function Sidebar({ workspaceName, scenario, onNavigate }: { workspaceName
                     key={it.href}
                     href={it.href}
                     onClick={onNavigate}
-                    className={`relative block rounded-[6px] px-3 py-2 text-sm ${active ? "bg-[#1a1a1e] text-white before:absolute before:left-0 before:top-1 before:bottom-1 before:w-[3px] before:rounded-full before:bg-[#E8622C]" : "text-zinc-400 hover:bg-zinc-900 hover:text-white"}`}
+                    className={`relative block rounded-[6px] px-3 py-2 text-sm ${active ? "bg-[#FCEBE3]/10 text-white before:absolute before:left-0 before:top-1 before:bottom-1 before:w-[3px] before:rounded-full before:bg-[#E8622C]" : "text-zinc-400 hover:bg-zinc-900 hover:text-white"}`}
                   >
                     {it.label}
                   </Link>
