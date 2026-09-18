@@ -12,8 +12,10 @@ export type FxQuote = {
 };
 
 export type NairaEquivalent = {
-  usd: number;
-  naira: number; // estimated
+  usd: number; // dollars
+  naira: number; // naira (estimated) — derived for display
+  usdCents: number; // authoritative cents
+  nairaKobo: number; // authoritative kobo
   rate: number;
   observedAt: string;
   source: string;

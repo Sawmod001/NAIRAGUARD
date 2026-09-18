@@ -6,11 +6,33 @@ import type { FxQuote, NairaEquivalent } from "./types";
  * Keeps USD, adds estimated NGN, explicit rate/timestamp/source.
  */
 
+function toCents(usd: number) { return Math.round(usd * 100); }
+
 export function toNairaEquivalent(usd: number, fx: FxQuote): NairaEquivalent {
   if (!isFinite(usd) || !isFinite(fx.rate)) throw new Error("Invalid conversion input");
+  const usdCents = toCents(usd);
+  // NGN kobo = usdCents * rate (since usdCents/100 * rate *100)
+  const nairaKobo = Math.round(usdCents * fx.rate);
   return {
-    usd: Math.round(usd * 100) / 100,
-    naira: Math.round(usd * fx.rate * 100) / 100,
+    usd: Math.round(usdCents) / 100,
+    naira: Math.round(nairaKobo) / 100,
+    usdCents,
+    nairaKobo,
+    rate: fx.rate,
+    observedAt: fx.observedAt,
+    source: fx.source,
+    label: "Estimated Naira equivalent",
+  };
+}
+
+export function toNairaEquivalentFromCents(usdCents: number, fx: FxQuote): NairaEquivalent {
+  if (!Number.isInteger(usdCents) || !isFinite(fx.rate)) throw new Error("Invalid conversion input");
+  const nairaKobo = Math.round(usdCents * fx.rate);
+  return {
+    usd: Math.round(usdCents) / 100,
+    naira: Math.round(nairaKobo) / 100,
+    usdCents,
+    nairaKobo,
     rate: fx.rate,
     observedAt: fx.observedAt,
     source: fx.source,
@@ -20,6 +42,10 @@ export function toNairaEquivalent(usd: number, fx: FxQuote): NairaEquivalent {
 
 export function convertUsdToNgn(usd: number, rate: number): number {
   return Math.round(usd * rate * 100) / 100;
+}
+
+export function convertCentsToKobo(usdCents: number, rate: number): number {
+  return Math.round(usdCents * rate);
 }
 
 /** For display: always show USD + estimated NGN + rate context. */
