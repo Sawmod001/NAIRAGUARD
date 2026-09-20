@@ -39,7 +39,7 @@ export function ConnectForm({ organizationName }: { organizationName: string }) 
       </button>
       {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
       <p className="mt-3 text-xs leading-5 text-zinc-500">
-        Connects {organizationName} to a production-style workspace. No AWS credentials needed for this step.
+        Connects {organizationName} to a production-style workspace. Takes seconds — connecting AWS comes later, from Connections.
       </p>
     </div>
   );

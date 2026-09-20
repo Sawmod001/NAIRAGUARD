@@ -1,6 +1,6 @@
 export function HowItWorks() {
   const steps = [
-    { n: "01", title: "CONNECT", desc: "Bring AWS cost & recommendation data. Demo mode needs no live account.", color: "bg-white text-black" },
+    { n: "01", title: "CONNECT", desc: "Bring AWS cost & recommendation data. Explore first with a guided dataset.", color: "bg-white text-black" },
     { n: "02", title: "NORMALIZE", desc: "Provider data → consistent model. Costs & recs comparable.", color: "bg-zinc-900 text-white" },
     { n: "03", title: "CALCULATE", desc: "Deterministic: totals, %, aggregates, NGN. No LLM math.", color: "bg-orange-500 text-black" },
     { n: "04", title: "EXPLAIN", desc: "AI explains evidence, risks, next steps — not financial truth.", color: "bg-black text-white" },

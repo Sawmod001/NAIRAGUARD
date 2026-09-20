@@ -9,7 +9,7 @@ export default function SignUpPage() {
       <div className="w-full max-w-md">
         <div className="mb-6 text-center">
           <h1 className="text-2xl font-semibold tracking-tight">Create your NairaGuard account</h1>
-          <p className="mt-2 text-sm text-zinc-600">Prod auth • No AWS credentials needed</p>
+          <p className="mt-2 text-sm text-zinc-600">Prod auth • Workspace ready in minutes</p>
         </div>
         <Suspense fallback={null}>
           <SignUpForm />

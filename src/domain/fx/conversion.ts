@@ -48,6 +48,14 @@ export function convertCentsToKobo(usdCents: number, rate: number): number {
   return Math.round(usdCents * rate);
 }
 
+/**
+ * Display label for an FX source — NG-DEMO-07.
+ * Provider contracts keep raw ids (e.g. "demo-fixture"); public UI shows neutral provenance.
+ */
+export function displayFxSource(source: string): string {
+  return source === "demo-fixture" ? "recorded rate" : source;
+}
+
 /** For display: always show USD + estimated NGN + rate context. */
 export function formatNairaEquivalent(eq: NairaEquivalent): string {
   return `Estimated Naira equivalent: ₦${eq.naira.toLocaleString()} at ₦${eq.rate.toLocaleString()}/USD (${eq.source}, ${eq.observedAt.slice(0, 10)}) — USD $${eq.usd.toLocaleString()}`;

@@ -17,9 +17,9 @@ export default function ConnectionsPage() {
           <button disabled className="mt-4 rounded-full bg-zinc-900 px-5 py-2 text-sm font-medium text-white opacity-60">Connect AWS — coming soon</button>
         </div>
         <div className="rounded-2xl border border-stone-200 bg-white p-6">
-          <div className="font-mono text-xs tracking-widest text-stone-500">DEMO ENVIRONMENT</div>
+          <div className="font-mono text-xs tracking-widest text-stone-500">ACTIVE DATASET</div>
           <div className="mt-2 text-sm font-medium">Currently active · Balanced Startup</div>
-          <div className="text-sm text-stone-600">Synthetic AWS environment · No live AWS access · ~$1,378 · 2 opportunities · NGN estimates at recorded rate</div>
+          <div className="text-sm text-stone-600">Workspace dataset · ~$1,378 · 2 opportunities · NGN estimates at recorded rate</div>
           <Link href="/dashboard?scenario=balanced-startup" className="mt-4 inline-flex rounded-full border border-stone-200 bg-white px-5 py-2 text-sm hover:bg-zinc-50">
             Change scenario in Dashboard
           </Link>

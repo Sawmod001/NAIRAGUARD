@@ -31,7 +31,7 @@ export default async function CostsPage({ searchParams }: { searchParams: Promis
       <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <div>
           <h1 className="font-display text-2xl font-semibold tracking-tight">Costs</h1>
-          <p className="text-sm text-stone-500">Analytical view — where cost is happening, by service and region. <span className="text-stone-400">Demo · {dataset.scenario.name}</span></p>
+          <p className="text-sm text-stone-500">Analytical view — where cost is happening, by service and region. <span className="text-stone-400">{dataset.scenario.name}</span></p>
         </div>
         <div className="flex gap-1 rounded-lg border border-stone-200 bg-white p-1">
           {[7, 30, 90].map((d) => (

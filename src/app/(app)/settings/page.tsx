@@ -37,7 +37,7 @@ export default async function SettingsPage() {
         <section className="rounded-2xl border border-stone-200 bg-white p-6">
           <h2 className="font-mono text-xs tracking-widest text-stone-500">CONNECTIONS</h2>
           <div className="mt-2 flex items-center justify-between">
-            <div className="text-sm">AWS · Not connected · <span className="text-stone-500">Demo active</span></div>
+            <div className="text-sm">AWS · Not connected · <span className="text-stone-500">Workspace active</span></div>
             <a href="/connections" className="rounded-full border border-stone-200 bg-white px-3 py-1 text-xs hover:bg-zinc-50">Manage</a>
           </div>
           <div className="mt-2 text-xs text-stone-500">Live will use IAM Role + STS, no long-lived keys.</div>
@@ -47,7 +47,7 @@ export default async function SettingsPage() {
           <h2 className="font-mono text-xs tracking-widest text-stone-500">PREFERENCES</h2>
           <div className="mt-2 grid gap-2 text-sm">
             <div className="flex justify-between"><span>Currency context</span><span className="font-medium">USD + NGN estimate</span></div>
-            <div className="flex justify-between"><span>FX source</span><span className="font-medium">demo-fixture</span></div>
+            <div className="flex justify-between"><span>FX source</span><span className="font-medium">recorded rate</span></div>
             <div className="flex justify-between"><span>Timezone</span><span className="font-medium">Africa/Lagos</span></div>
           </div>
         </section>

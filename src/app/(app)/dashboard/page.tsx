@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma/client";
 import { DemoCostProvider } from "@/infrastructure/providers/demo/cost-provider";
 import { DemoOptimizationProvider } from "@/infrastructure/providers/demo/optimization-provider";
 import { normalizeCostResult } from "@/domain/costs/normalize";
-import { toNairaEquivalent } from "@/domain/fx";
+import { displayFxSource, toNairaEquivalent } from "@/domain/fx";
 import { aggregateSavings } from "@/domain/finops";
 import { prioritizeRecommendations } from "@/domain/optimizations";
 import { getDemoDataset } from "@/infrastructure/providers/demo/registry";
@@ -57,7 +57,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-2 text-xs">
-            <span className="rounded-full bg-[#0E0E0F] px-3 py-1.5 text-white">Demo · {dataset.scenario.name}</span>
+            <span className="rounded-full bg-[#0E0E0F] px-3 py-1.5 text-white">{dataset.scenario.name}</span>
             <span className="rounded-full border border-[#E7E5E2] bg-white px-3 py-1.5 text-[#6B6B6E]">Last {period} days</span>
             <Link href={costsHref} className="rounded-full border border-[#E7E5E2] bg-white px-3 py-1.5 text-[#0E0E0F] hover:bg-[#FAFAF9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E8622C]">View costs</Link>
           </div>
@@ -84,7 +84,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
                   <span className="inline-flex items-center gap-1 rounded-full border border-[#E7E5E2] px-2 py-0.5 text-[11px] text-[#6B6B6E]"><span className={`h-1.5 w-1.5 rounded-full ${fxAgeDays <= 2 ? "bg-emerald-500" : "bg-amber-500"}`} /> FX updated {fxAgeDays}d ago</span>
                 </div>
                 <div className="mt-2 text-[30px] font-semibold leading-none tracking-tight text-[#0E0E0F] tabular-nums"><CountUp value={totalNgn.naira} prefix="₦" /></div>
-                <div className="text-xs text-[#6B6B6E]">at ₦{fx.rate.toLocaleString()}/USD · {new Date(fx.observedAt).toLocaleDateString()} · {fx.source}</div>
+                <div className="text-xs text-[#6B6B6E]">at ₦{fx.rate.toLocaleString()}/USD · {new Date(fx.observedAt).toLocaleDateString()} · {displayFxSource(fx.source)}</div>
                 <details className="mt-2 text-xs text-[#6B6B6E]"><summary className="cursor-pointer text-[#E8622C] hover:underline">How calculated</summary><span className="mt-1 block">${cost.total.toLocaleString()} × ₦{fx.rate.toLocaleString()} = ₦{totalNgn.naira.toLocaleString()} · Estimate, not a bank charge.</span></details>
               </CardContent>
             </Card>
@@ -206,7 +206,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
         </PanelErrorBoundary>
 
         <div className="rounded-[8px] border border-[#E7E5E2] bg-white px-4 py-3 text-xs leading-5 text-[#6B6B6E]">
-          <span className="font-mono tracking-widest">DEMO · {dataset.scenario.name} ·</span> Synthetic AWS data · Last sync {syncedAgo} · FX ₦{fx.rate.toLocaleString()}/USD · <span className="font-medium">NGN estimates — not bank charges.</span> <Link href="/connections" className="text-[#E8622C] underline hover:text-[#0E0E0F]">How NairaGuard connects</Link>
+          <span className="font-mono tracking-widest">{dataset.scenario.name} ·</span> Last sync {syncedAgo} · FX ₦{fx.rate.toLocaleString()}/USD · <span className="font-medium">NGN estimates — not bank charges.</span> <Link href="/connections" className="text-[#E8622C] underline hover:text-[#0E0E0F]">How NairaGuard connects</Link>
         </div>
     </div>
   );

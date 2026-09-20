@@ -75,7 +75,7 @@ export default async function RecommendationDetailPage({ params, searchParams }:
             <span className="rounded border border-zinc-200 px-2 py-1 text-xs">Accept</span>
             <span className="rounded border border-zinc-200 px-2 py-1 text-xs">Dismiss</span>
           </div>
-          <div className="mt-1 text-xs text-zinc-500">Demo: updates status, not AWS</div>
+          <div className="mt-1 text-xs text-zinc-500">Read-only: updates status here, never changes AWS</div>
         </div>
       </div>
 

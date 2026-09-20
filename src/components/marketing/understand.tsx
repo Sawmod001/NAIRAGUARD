@@ -17,7 +17,7 @@ export function Understand() {
               <div className="font-display text-5xl font-semibold text-orange-500">₦183,985</div>
               <div className="font-mono text-xs tracking-widest text-zinc-500">ESTIMATED NAIRA EQUIVALENT</div>
             </div>
-            <div className="mt-4 font-mono text-xs text-zinc-500">FX 1,550 • 2026-09-15 • demo-fixture • Not exact bank charge</div>
+            <div className="mt-4 font-mono text-xs text-zinc-500">FX 1,550 • 2026-09-15 • recorded rate • Not exact bank charge</div>
           </div>
           <div className="space-y-4 text-sm text-zinc-300">
             <p>NairaGuard translates USD costs and potential savings into estimated Naira equivalent using recorded rate and timestamp.</p>

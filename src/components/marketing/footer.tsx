@@ -6,7 +6,7 @@ export function Footer() {
           <div>
             <div className="font-display font-semibold text-white">NairaGuard</div>
             <div className="text-xs">AWS FinOps, built with Naira in mind.</div>
-            <div className="mt-2 font-mono text-xs">Demo Mode</div>
+            <a href="/onboarding" className="mt-2 block font-mono text-xs hover:text-white">Try Demo →</a>
           </div>
           <div>
             <div className="font-mono text-xs tracking-widest text-zinc-500">PRODUCT</div>
@@ -14,7 +14,7 @@ export function Footer() {
               <a href="/dashboard" className="block hover:text-white">Dashboard</a>
               <a href="/costs" className="block hover:text-white">Costs</a>
               <a href="/optimizations" className="block hover:text-white">Optimizations</a>
-              <a href="/onboarding" className="block hover:text-white">Demo</a>
+              <a href="/onboarding" className="block hover:text-white">Try Demo</a>
             </div>
           </div>
           <div>
@@ -24,7 +24,7 @@ export function Footer() {
               <a href="/terms" className="block hover:text-white">Terms</a>
             </div>
           </div>
-          <div className="font-mono text-xs">© 2026 NairaGuard • Demo synthetic • No live AWS</div>
+          <div className="font-mono text-xs">© 2026 NairaGuard • Naira estimates, not bank charges</div>
         </div>
       </div>
     </footer>
