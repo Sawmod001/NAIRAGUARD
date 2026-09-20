@@ -9,6 +9,8 @@ import { checkRateLimit, RatePresets } from "@/lib/rate-limit";
  * Rate limiting: 429 + Retry-After per spec §2.
  */
 
+// NG-DEMO-06: /onboarding is the authenticated Connect step —
+// Try Demo → Create account / Sign in → Connect to Demo → Workspace.
 const publicRoutes = [
   "/",
   "/sign-in",
@@ -17,7 +19,6 @@ const publicRoutes = [
   "/reset-password",
   "/privacy",
   "/terms",
-  "/onboarding",
   "/api/auth",
 ];
 

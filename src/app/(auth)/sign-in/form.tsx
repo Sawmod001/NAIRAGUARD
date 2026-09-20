@@ -66,7 +66,10 @@ export function SignInForm() {
         </button>
         <p className="text-center text-sm text-zinc-600">
           No account?{" "}
-          <a href="/sign-up" className="font-medium text-black underline">
+          <a
+            href={`/sign-up?callbackUrl=${encodeURIComponent(callbackUrl)}`}
+            className="font-medium text-black underline"
+          >
             Create one
           </a>
         </p>

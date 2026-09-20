@@ -1,4 +1,7 @@
+import { Suspense } from "react";
 import { SignUpForm } from "./form";
+
+export const dynamic = "force-dynamic";
 
 export default function SignUpPage() {
   return (
@@ -8,7 +11,9 @@ export default function SignUpPage() {
           <h1 className="text-2xl font-semibold tracking-tight">Create your NairaGuard account</h1>
           <p className="mt-2 text-sm text-zinc-600">Prod auth • No AWS credentials needed</p>
         </div>
-        <SignUpForm />
+        <Suspense fallback={null}>
+          <SignUpForm />
+        </Suspense>
       </div>
     </main>
   );
