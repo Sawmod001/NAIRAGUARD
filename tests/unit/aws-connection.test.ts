@@ -28,6 +28,8 @@ describe("aws connection lifecycle (NG-AWS-01)", () => {
       ["SYNCED", "SYNCING"],
       ["SYNCED", "STALE"],
       ["STALE", "SYNCING"],
+      ["SYNCING", "DISCONNECTED"],
+      ["STALE", "DISCONNECTED"],
     ];
     for (const [from, to] of path) expect(canTransition(from, to)).toBe(true);
   });

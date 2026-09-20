@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { auth } from "@/auth";
+import { prisma } from "@/lib/prisma/client";
 import { getDemoDataset } from "@/infrastructure/providers/demo/registry";
 import { maskAwsAccountId } from "@/schemas/demo";
 import { getEnv } from "@/lib/env/server";
@@ -10,11 +12,25 @@ import {
   TRUST_EXPECTATIONS,
 } from "@/domain/aws/iam";
 import { CopyBlock } from "@/components/ui/copy-block";
+import { ConnectForm, DisconnectButton } from "./connect-form";
 
-export default function ConnectionsPage() {
+const FAILURE_STATUSES = ["AUTH_FAILED", "PERMISSION_DENIED", "RATE_LIMITED", "ERROR"];
+
+export default async function ConnectionsPage() {
   // NG-DEMO-02: seeded workspace account (single Production Account; multi-account arrives with live AWS).
   const dataset = getDemoDataset("balanced-startup");
   const masked = maskAwsAccountId(dataset.scenario.accountId);
+
+  // NG-AWS-04: latest live connection for this org (session-derived, never client input).
+  const session = await auth();
+  const userId = (session?.user as unknown as { id?: string })?.id;
+  const membership = userId ? await prisma.membership.findFirst({ where: { userId } }) : null;
+  const live = membership
+    ? await prisma.awsConnection.findFirst({
+        where: { organizationId: membership.organizationId },
+        orderBy: { updatedAt: "desc" },
+      })
+    : null;
   return (
     <div className="space-y-6">
       <div>
@@ -25,10 +41,33 @@ export default function ConnectionsPage() {
       <div className="grid gap-4 md:grid-cols-2">
         <div className="rounded-2xl border border-stone-200 bg-white p-6">
           <div className="font-mono text-xs tracking-widest text-stone-500">AWS CONNECTION</div>
-          <div className="mt-2 flex items-center gap-2 text-sm font-medium"><span className="h-2 w-2 rounded-full bg-amber-500" aria-hidden /> Not connected</div>
-          <div className="mt-1 text-sm leading-6 text-stone-600">Connect an AWS account to analyze live costs. NairaGuard uses read-only, least-privilege access via IAM Role + STS — no long-lived keys stored.</div>
-          <div className="mt-4 rounded-xl bg-stone-50 p-3 text-xs leading-5 text-stone-600">Required (future): Cost Explorer, Cost Optimization Hub, Compute Optimizer read access. Data is cached — not re-fetched on every page.</div>
-          <button disabled className="mt-4 rounded-full bg-zinc-900 px-5 py-2 text-sm font-medium text-white opacity-60">Connect AWS — coming soon</button>
+          {!live || live.status === "DISCONNECTED" ? (
+            <>
+              <div className="mt-2 flex items-center gap-2 text-sm font-medium"><span className="h-2 w-2 rounded-full bg-amber-500" aria-hidden /> Not connected</div>
+              <div className="mt-1 text-sm leading-6 text-stone-600">Connect an AWS account to analyze live costs. NairaGuard uses read-only, least-privilege access via IAM Role + STS — no long-lived keys stored.</div>
+              <ConnectForm />
+            </>
+          ) : live.status === "PENDING" || live.status === "VALIDATING" ? (
+            <>
+              <div className="mt-2 flex items-center gap-2 text-sm font-medium"><span className="h-2 w-2 rounded-full bg-sky-500" aria-hidden /> Validation pending</div>
+              <div className="mt-1 font-mono text-xs leading-5 text-stone-600">{live.roleArn}</div>
+              <div className="mt-3"><CopyBlock label="WORKSPACE EXTERNAL ID" value={live.externalId} /></div>
+              <div className="mt-3 text-xs leading-5 text-stone-600">Paste this ID into the role&apos;s trust policy. Automatic validation runs in the next update.</div>
+              <DisconnectButton />
+            </>
+          ) : FAILURE_STATUSES.includes(live.status) ? (
+            <>
+              <div className="mt-2 flex items-center gap-2 text-sm font-medium"><span className="h-2 w-2 rounded-full bg-red-500" aria-hidden /> {live.status.replace(/_/g, " ")}</div>
+              <div className="mt-1 text-sm leading-6 text-stone-600">{live.lastError ?? "The last attempt failed. Check the role and try again with a corrected ARN."}</div>
+              <ConnectForm />
+            </>
+          ) : (
+            <>
+              <div className="mt-2 flex items-center gap-2 text-sm font-medium"><span className="h-2 w-2 rounded-full bg-emerald-500" aria-hidden /> {live.status.replace(/_/g, " ")}</div>
+              <div className="mt-1 font-mono text-xs leading-5 text-stone-600">{live.roleArn}</div>
+              <DisconnectButton />
+            </>
+          )}
         </div>
         <div className="rounded-2xl border border-stone-200 bg-white p-6">
           <div className="font-mono text-xs tracking-widest text-stone-500">ACTIVE DATASET</div>
