@@ -36,12 +36,39 @@ export async function signUp(raw: unknown): Promise<{ ok: true; userId: string }
     return { ok: false, error: "Email already registered.", field: "email" };
   }
   const hash = await bcrypt.hash(password, 12);
+  // NG-ORG-01 forward: slug/type/country per 02-AUTH-ORG-DEMO.md (no currency selector)
+  const orgName = (name?.trim() || email.split("@")[0] || "Personal") + "'s Workspace";
+  const baseSlug = orgName
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 48) || "workspace";
+  let slug = baseSlug;
+  for (let i = 0; i < 5; i++) {
+    const candidate = i === 0 ? baseSlug : `${baseSlug}-${i + 1}`;
+    const existingOrg = await prisma.organization.findUnique({ where: { slug: candidate } });
+    if (!existingOrg) {
+      slug = candidate;
+      break;
+    }
+  }
   try {
     const result = await prisma.$transaction(async (tx) => {
       const user = await tx.user.create({ data: { email, password: hash, name: name?.trim() || null } });
-      const orgName = (name?.trim() || email.split("@")[0] || "Personal") + "'s Workspace";
-      const org = await tx.organization.create({ data: { name: orgName } });
-      await tx.membership.create({ data: { userId: user.id, organizationId: org.id, role: "owner" } });
+      let finalSlug = slug;
+      for (let i = 0; i < 5; i++) {
+        const c = i === 0 ? slug : `${slug}-${i + 1}`;
+        const ex = await tx.organization.findUnique({ where: { slug: c } });
+        if (!ex) {
+          finalSlug = c;
+          break;
+        }
+      }
+      const slugExists = await tx.organization.findUnique({ where: { slug: finalSlug } });
+      if (slugExists) finalSlug = `${slug}-${Math.random().toString(36).slice(2, 6)}`;
+      const org = await tx.organization.create({ data: { name: orgName, slug: finalSlug, type: "workspace", country: "NG" } });
+      await tx.membership.create({ data: { userId: user.id, organizationId: org.id, role: "OWNER" } });
       return user;
     });
     return { ok: true, userId: result.id };

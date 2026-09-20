@@ -13,6 +13,8 @@ const publicRoutes = [
   "/",
   "/sign-in",
   "/sign-up",
+  "/forgot-password",
+  "/reset-password",
   "/privacy",
   "/terms",
   "/onboarding",
@@ -38,7 +40,7 @@ export default auth((req) => {
   const userKey = (req.auth?.user as { id?: string })?.id ?? ip;
 
   // Auth endpoints strict
-  if (pathname.startsWith("/api/auth") || pathname === "/sign-in" || pathname === "/sign-up") {
+  if (pathname.startsWith("/api/auth") || pathname === "/sign-in" || pathname === "/sign-up" || pathname === "/forgot-password" || pathname === "/reset-password") {
     const key = `auth:${ip}:${pathname}`;
     const res = checkRateLimit(key, RatePresets.auth.limit, RatePresets.auth.windowMs);
     if (!res.allowed) {

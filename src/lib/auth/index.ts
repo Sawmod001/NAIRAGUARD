@@ -7,3 +7,4 @@ export { requireAuth, getAuth, isAuthenticated } from "./helpers";
 export { requireAuthWithOrg, assertMembership, requireOrganization, getAuthorizedOrganizationIds, scopedOrganizationId } from "./authorization";
 export { ensurePersonalOrganization, getUserOrganizations, getCurrentOrganization } from "./organization";
 export { signUp } from "./actions";
+export { requestPasswordReset, resetPassword } from "./password-reset";

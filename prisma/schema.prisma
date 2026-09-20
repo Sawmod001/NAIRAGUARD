@@ -78,9 +78,27 @@ model VerificationToken {
   @@map("verification_tokens")
 }
 
+// NG-AUTH-05: password reset tokens — hashed at rest, single-use, 1h expiry
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  email     String
+  tokenHash String    @unique
+  expires   DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([email])
+  @@index([expires])
+  @@map("password_reset_tokens")
+}
+
+// NG-ORG-01 (merged forward): slug/type/country per 02-AUTH-ORG-DEMO.md
 model Organization {
   id             String          @id @default(cuid())
   name           String
+  slug           String          @unique
+  type           String          @default("workspace")
+  country        String          @default("NG")
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
   memberships    Membership[]
@@ -93,7 +111,7 @@ model Membership {
   id             String       @id @default(cuid())
   userId         String
   organizationId String
-  role           String       @default("owner")
+  role           String       @default("OWNER")
   createdAt      DateTime     @default(now())
   user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)

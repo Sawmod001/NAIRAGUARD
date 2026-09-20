@@ -43,8 +43,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const existingMembership = await prisma.membership.findFirst({ where: { userId: user.id } });
         if (!existingMembership) {
           const orgName = (user.name?.trim() || user.email.split("@")[0] || "Personal") + "'s Workspace";
-          const org = await prisma.organization.create({ data: { name: orgName } });
-          await prisma.membership.create({ data: { userId: user.id, organizationId: org.id, role: "owner" } });
+          const base = orgName.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 48) || "workspace";
+          let slug = base;
+          for (let i = 0; i < 5; i++) {
+            const c = i === 0 ? base : `${base}-${i + 1}`;
+            const ex = await prisma.organization.findUnique({ where: { slug: c } });
+            if (!ex) { slug = c; break; }
+          }
+          const org = await prisma.organization.create({ data: { name: orgName, slug, type: "workspace", country: "NG" } });
+          await prisma.membership.create({ data: { userId: user.id, organizationId: org.id, role: "OWNER" } });
         }
         return { id: user.id, email: user.email, name: user.name ?? undefined };
       },

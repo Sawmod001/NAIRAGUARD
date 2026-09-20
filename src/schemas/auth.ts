@@ -27,5 +27,29 @@ export const signInSchema = z.object({
   password: z.string().min(1, "Required"),
 });
 
+export const forgotPasswordSchema = z.object({
+  email: z.string().trim().toLowerCase().email("Invalid email").max(254),
+});
+
+const resetPasswordValue = z
+  .string()
+  .min(8, "At least 8 characters")
+  .max(128)
+  .regex(/[A-Z]/, "Need 1 uppercase")
+  .regex(/[0-9]/, "Need 1 number");
+
+export const resetPasswordSchema = z
+  .object({
+    token: z.string().trim().min(16, "Invalid reset token").max(256),
+    password: resetPasswordValue,
+    confirmPassword: z.string(),
+  })
+  .refine((v) => v.password === v.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
+
 export type SignUpInput = z.infer<typeof signUpSchema>;
 export type SignInInput = z.infer<typeof signInSchema>;
+export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
+export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
