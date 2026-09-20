@@ -28,7 +28,7 @@ describe("finops", () => {
     expect(sorted[0]!.externalId).toBe("A");
   });
   it("demo dataset valid", () => {
-    const raw = { scenario: { id: "balanced-startup", name: "Balanced", accountId: "123456789012" }, cost: { periodDays: 1, daily: [{ dateOffset: 0, amountUsd: 10 }], serviceBreakdown: [{ service: "EC2", amountUsd: 10, percentage: 100 }] }, fx: { usdNgn: 1500, provider: "x", observedAt: "2026-09-15T00:00:00Z" }, recommendations: [] };
+    const raw = { scenario: { id: "balanced-startup", name: "Balanced", accountId: "123456789012", accountName: "Production Account", regions: ["eu-west-1"] }, cost: { periodDays: 1, daily: [{ dateOffset: 0, amountUsd: 10 }], serviceBreakdown: [{ service: "EC2", amountUsd: 10, percentage: 100 }] }, fx: { usdNgn: 1500, provider: "x", observedAt: "2026-09-15T00:00:00Z" }, recommendations: [] };
     expect(demoDatasetSchema.safeParse(raw).success).toBe(true);
   });
 });

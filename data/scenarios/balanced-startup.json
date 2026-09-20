@@ -2,7 +2,9 @@
   "scenario": {
     "id": "balanced-startup",
     "name": "Balanced Startup",
-    "accountId": "999977463648"
+    "accountId": "123456789012",
+    "accountName": "Production Account",
+    "regions": ["eu-west-1"]
   },
   "cost": {
     "periodDays": 30,

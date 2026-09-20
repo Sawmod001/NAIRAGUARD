@@ -1,10 +1,14 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma/client";
+import { getDemoDataset } from "@/infrastructure/providers/demo/registry";
+import { maskAwsAccountId } from "@/schemas/demo";
 
 export default async function SettingsPage() {
   const session = await auth();
   const userId = (session?.user as unknown as { id?: string })?.id;
   const org = userId ? await prisma.membership.findFirst({ where: { userId }, include: { organization: true } }).then((m) => m?.organization ?? null) : null;
+  // NG-DEMO-02: seeded workspace account.
+  const account = getDemoDataset("balanced-startup").scenario;
 
   return (
     <div className="space-y-6">
@@ -37,7 +41,7 @@ export default async function SettingsPage() {
         <section className="rounded-2xl border border-stone-200 bg-white p-6">
           <h2 className="font-mono text-xs tracking-widest text-stone-500">CONNECTIONS</h2>
           <div className="mt-2 flex items-center justify-between">
-            <div className="text-sm">AWS · Not connected · <span className="text-stone-500">Workspace active</span></div>
+            <div className="text-sm">AWS · {account.accountName} · <span className="font-mono">{maskAwsAccountId(account.accountId)}</span></div>
             <a href="/connections" className="rounded-full border border-stone-200 bg-white px-3 py-1 text-xs hover:bg-zinc-50">Manage</a>
           </div>
           <div className="mt-2 text-xs text-stone-500">Live will use IAM Role + STS, no long-lived keys.</div>

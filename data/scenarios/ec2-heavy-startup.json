@@ -2,7 +2,9 @@
   "scenario": {
     "id": "ec2-heavy-startup",
     "name": "EC2-Heavy Startup",
-    "accountId": "999947640150"
+    "accountId": "123456789012",
+    "accountName": "Production Account",
+    "regions": ["eu-west-1", "eu-central-1"]
   },
   "cost": {
     "periodDays": 30,

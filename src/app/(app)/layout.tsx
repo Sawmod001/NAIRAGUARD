@@ -2,6 +2,8 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma/client";
 import { AppShell } from "@/components/app/shell/app-shell";
+import { getDemoDataset } from "@/infrastructure/providers/demo/registry";
+import { maskAwsAccountId } from "@/schemas/demo";
 import { headers } from "next/headers";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
@@ -41,5 +43,14 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   // Demo scenario — later from org preference, for now Balanced Startup
   const scenario = "Balanced Startup";
 
-  return <AppShell workspaceName={workspaceName} scenario={scenario}>{children}</AppShell>;
+  // NG-DEMO-02: seeded workspace account, data-driven from the default dataset.
+  let accountLabel = "Production Account · 1234••••9012";
+  try {
+    const seed = getDemoDataset("balanced-startup").scenario;
+    accountLabel = `${seed.accountName} · ${maskAwsAccountId(seed.accountId)}`;
+  } catch {
+    // Seed unreadable → fall back to the static label, never block the shell
+  }
+
+  return <AppShell workspaceName={workspaceName} scenario={scenario} accountLabel={accountLabel}>{children}</AppShell>;
 }

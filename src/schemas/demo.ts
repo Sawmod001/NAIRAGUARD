@@ -8,10 +8,15 @@ import { z } from "zod";
  */
 
 // --- Scenario meta ---
+// NG-DEMO-02: one workspace → one customer org → one AWS account (no AWS-Org
+// selection in the demo). Multi-org stays in the architecture for Phase 4;
+// the demo seeds a single Production Account across all datasets.
 export const demoScenarioMetaSchema = z.object({
   id: z.string().min(1),
   name: z.string().min(1),
   accountId: z.string().regex(/^\d{12}$/, "12-digit AWS account"),
+  accountName: z.string().min(1),
+  regions: z.array(z.string().min(1)).min(1),
 });
 
 // --- Cost ---
@@ -76,6 +81,12 @@ export const demoDatasetSchema = z
     recommendations: z.array(demoRecommendationSchema),
   })
   .superRefine((val, ctx) => {
+    // Hierarchy coherence: every finding + resource must live in the seeded account's regions
+    for (const r of val.recommendations) {
+      if (!val.scenario.regions.includes(r.region)) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: `region ${r.region} not in account regions for ${r.externalId}`, path: ["recommendations"] });
+      }
+    }
     // Ensure savings <= cost where applicable (realistic)
     for (const r of val.recommendations) {
       if (r.estimatedMonthlySavingsUsd > r.estimatedMonthlyCostUsd + 0.01) {
@@ -92,6 +103,13 @@ export type DemoCost = z.infer<typeof demoCostSchema>;
 export type DemoRecommendation = z.infer<typeof demoRecommendationSchema>;
 
 // --- Helpers for dashboard calcs ---
+/** Masked account display: 123456789012 → 1234••••9012. Full id stays in the data contract. */
+export function maskAwsAccountId(accountId: string): string {
+  const digits = accountId.replace(/\D/g, "");
+  if (digits.length !== 12) return "••••";
+  return `${digits.slice(0, 4)}••••${digits.slice(-4)}`;
+}
+
 export function demoTotalUsd(dataset: DemoDataset): number {
   return dataset.cost.daily.reduce((s, d) => s + d.amountUsd, 0);
 }

@@ -4,6 +4,7 @@ import { DemoCostProvider } from "@/infrastructure/providers/demo/cost-provider"
 import { DemoOptimizationProvider } from "@/infrastructure/providers/demo/optimization-provider";
 import { normalizeCostResult } from "@/domain/costs/normalize";
 import { displayFxSource, toNairaEquivalent } from "@/domain/fx";
+import { maskAwsAccountId } from "@/schemas/demo";
 import { aggregateSavings } from "@/domain/finops";
 import { prioritizeRecommendations } from "@/domain/optimizations";
 import { getDemoDataset } from "@/infrastructure/providers/demo/registry";
@@ -206,7 +207,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
         </PanelErrorBoundary>
 
         <div className="rounded-[8px] border border-[#E7E5E2] bg-white px-4 py-3 text-xs leading-5 text-[#6B6B6E]">
-          <span className="font-mono tracking-widest">{dataset.scenario.name} ·</span> Last sync {syncedAgo} · FX ₦{fx.rate.toLocaleString()}/USD · <span className="font-medium">NGN estimates — not bank charges.</span> <Link href="/connections" className="text-[#E8622C] underline hover:text-[#0E0E0F]">How NairaGuard connects</Link>
+          <span className="font-mono tracking-widest">{dataset.scenario.name} · {dataset.scenario.accountName} {maskAwsAccountId(dataset.scenario.accountId)} ·</span> Last sync {syncedAgo} · FX ₦{fx.rate.toLocaleString()}/USD · <span className="font-medium">NGN estimates — not bank charges.</span> <Link href="/connections" className="text-[#E8622C] underline hover:text-[#0E0E0F]">How NairaGuard connects</Link>
         </div>
     </div>
   );

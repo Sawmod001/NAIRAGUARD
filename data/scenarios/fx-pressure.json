@@ -2,7 +2,9 @@
   "scenario": {
     "id": "fx-pressure",
     "name": "FX Pressure",
-    "accountId": "999999468761"
+    "accountId": "123456789012",
+    "accountName": "Production Account",
+    "regions": ["eu-west-1"]
   },
   "cost": {
     "periodDays": 30,
