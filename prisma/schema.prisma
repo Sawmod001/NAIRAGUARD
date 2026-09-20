@@ -103,8 +103,45 @@ model Organization {
   updatedAt      DateTime        @updatedAt
   memberships    Membership[]
   activityEvents ActivityEvent[]
+  awsConnections AwsConnection[]
 
   @@map("organizations")
+}
+
+// NG-AWS-01: production AWS connection (cross-account IAM Role + STS).
+// No secret fields by design — NairaGuard never stores long-lived customer keys.
+// AWS Organization/Account discovery tables arrive in NG-AWS-06; the demo seeds
+// a single Production Account without touching this model.
+enum AwsConnectionStatus {
+  NOT_CONNECTED
+  PENDING
+  VALIDATING
+  CONNECTED
+  SYNCING
+  SYNCED
+  STALE
+  AUTH_FAILED
+  PERMISSION_DENIED
+  RATE_LIMITED
+  ERROR
+  DISCONNECTED
+}
+
+model AwsConnection {
+  id              String              @id @default(cuid())
+  organizationId  String
+  organization    Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  roleArn         String?
+  externalId      String              @unique
+  status          AwsConnectionStatus @default(NOT_CONNECTED)
+  lastValidatedAt DateTime?
+  lastError       String?
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+
+  @@index([organizationId])
+  @@index([organizationId, status])
+  @@map("aws_connections")
 }
 
 model Membership {
