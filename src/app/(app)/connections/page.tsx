@@ -1,6 +1,15 @@
 import Link from "next/link";
 import { getDemoDataset } from "@/infrastructure/providers/demo/registry";
 import { maskAwsAccountId } from "@/schemas/demo";
+import { getEnv } from "@/lib/env/server";
+import {
+  buildPermissionsPolicy,
+  buildTrustPolicy,
+  EXTERNAL_ID_PLACEHOLDER,
+  NAIRAGUARD_ACCOUNT_PLACEHOLDER,
+  TRUST_EXPECTATIONS,
+} from "@/domain/aws/iam";
+import { CopyBlock } from "@/components/ui/copy-block";
 
 export default function ConnectionsPage() {
   // NG-DEMO-02: seeded workspace account (single Production Account; multi-account arrives with live AWS).
@@ -34,6 +43,64 @@ export default function ConnectionsPage() {
             Change scenario in Dashboard
           </Link>
         </div>
+      </div>
+
+      <IamSetupGuide />
+    </div>
+  );
+}
+
+/**
+ * NG-AWS-02: least-privilege setup guidance. Read-only content — role creation,
+ * External ID issuance, and validation arrive in NG-AWS-03/04.
+ */
+function IamSetupGuide() {
+  const deliveryAccount = getEnv().AWS_NAIRAGUARD_ACCOUNT_ID ?? NAIRAGUARD_ACCOUNT_PLACEHOLDER;
+  const permissionsJson = JSON.stringify(buildPermissionsPolicy(), null, 2);
+  const trustJson = JSON.stringify(buildTrustPolicy(EXTERNAL_ID_PLACEHOLDER, deliveryAccount), null, 2);
+  return (
+    <div className="rounded-2xl border border-stone-200 bg-white p-6">
+      <div className="font-mono text-xs tracking-widest text-stone-500">CONNECT AWS — SETUP GUIDE</div>
+      <h2 className="mt-2 text-lg font-semibold tracking-tight">Grant read-only access with an IAM role</h2>
+      <p className="mt-1 max-w-2xl text-sm leading-6 text-stone-600">
+        NairaGuard reads your account through a cross-account IAM role with short-lived STS credentials.
+        Do not create access keys. Your workspace External ID is issued when connecting — role validation arrives in the next update.
+      </p>
+
+      <ol className="mt-5 space-y-5">
+        <li>
+          <div className="text-sm font-medium">1 · Create the role in your AWS account</div>
+          <p className="mt-1 text-sm leading-6 text-stone-600">
+            IAM → Roles → Create role → AWS account → Another AWS account → paste the NairaGuard account ID below →
+            require an External ID → paste the ID issued to your workspace at connect time.
+          </p>
+        </li>
+        <li>
+          <div className="text-sm font-medium">2 · Attach the least-privilege permissions policy</div>
+          <p className="mt-1 text-sm leading-6 text-stone-600">
+            Cost Explorer, Cost Optimization Hub, Compute Optimizer evidence, and read-only discovery. No write actions.
+          </p>
+          <div className="mt-3"><CopyBlock label="NAIRAGUARD-READ-ONLY-POLICY.JSON" value={permissionsJson} /></div>
+        </li>
+        <li>
+          <div className="text-sm font-medium">3 · Set the trust relationship</div>
+          <p className="mt-1 text-sm leading-6 text-stone-600">
+            Only NairaGuard may assume the role, and only with your workspace External ID.
+          </p>
+          <div className="mt-3"><CopyBlock label="TRUST-POLICY.JSON" value={trustJson} /></div>
+        </li>
+      </ol>
+
+      <div className="mt-5 rounded-xl bg-stone-50 p-4">
+        <div className="font-mono text-[10px] tracking-widest text-stone-500">TRUST EXPECTATIONS</div>
+        <ul className="mt-2 space-y-1.5">
+          {TRUST_EXPECTATIONS.map((line) => (
+            <li key={line} className="flex items-start gap-2 text-xs leading-5 text-stone-600">
+              <span className="mt-1.5 h-1 w-1 flex-shrink-0 rounded-full bg-stone-400" aria-hidden />
+              {line}
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   );
