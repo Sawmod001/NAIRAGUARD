@@ -11,6 +11,7 @@ import { canTransition, generateExternalId, type AwsConnectionStatus } from "@/d
 import { parseRoleArn } from "@/domain/aws/iam";
 import { StsValidationError, validateRoleAssumable } from "@/infrastructure/providers/aws/sts";
 import { getEnv } from "@/lib/env/server";
+import { ensureAwsAccount } from "@/lib/aws/registry";
 import { roleArnSchema } from "@/schemas/aws";
 
 /**
@@ -176,6 +177,13 @@ export async function validateConnection(): Promise<
         where: { id: latest.id },
         data: { status: "CONNECTED", lastValidatedAt: new Date(), lastError: null },
       });
+      // NG-AWS-06: validation discovers the account — register it (inventory only;
+      // a registry hiccup must not undo a proven connection).
+      try {
+        await ensureAwsAccount({ organizationId: org.id, accountId });
+      } catch (registryError) {
+        console.error("[NG-AWS-06] account registry write failed after successful validation:", registryError);
+      }
       return { ok: true, connection: toDTO(connected) };
     } catch (e) {
       const status = e instanceof StsValidationError ? e.status : ("ERROR" as const);

@@ -14,6 +14,7 @@ import {
 import { CopyBlock } from "@/components/ui/copy-block";
 import { ConnectForm, DisconnectButton, ValidateButton } from "./connect-form";
 import { getConnectionHealth, type AwsConnectionStatus } from "@/domain/aws/connection";
+import { listAwsAccounts } from "@/lib/aws/registry";
 
 const FAILURE_STATUSES = ["AUTH_FAILED", "PERMISSION_DENIED", "RATE_LIMITED", "ERROR"];
 
@@ -51,6 +52,9 @@ export default async function ConnectionsPage() {
         orderBy: { updatedAt: "desc" },
       })
     : null;
+  // NG-AWS-06: discovered accounts in scope for this workspace.
+  const discoveredAccounts =
+    membership && live && live.status !== "DISCONNECTED" ? await listAwsAccounts(membership.organizationId) : [];
   return (
     <div className="space-y-6">
       <div>
@@ -95,6 +99,14 @@ export default async function ConnectionsPage() {
               status={live.status as AwsConnectionStatus}
               lastValidatedAt={live.lastValidatedAt?.toISOString() ?? null}
             />
+          )}
+          {discoveredAccounts.length > 0 && (
+            <div className="mt-3 rounded-xl bg-stone-50 p-3 text-xs leading-5 text-stone-600">
+              <div className="font-mono text-[10px] tracking-widest text-stone-500">ACCOUNTS IN SCOPE · {discoveredAccounts.length}</div>
+              <div className="mt-1 font-mono text-[11px]">
+                {discoveredAccounts.map((a) => maskAwsAccountId(a.accountId)).join(" · ")}
+              </div>
+            </div>
           )}
         </div>
         <div className="rounded-2xl border border-stone-200 bg-white p-6">

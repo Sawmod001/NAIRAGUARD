@@ -104,6 +104,8 @@ model Organization {
   memberships    Membership[]
   activityEvents ActivityEvent[]
   awsConnections AwsConnection[]
+  awsOrganizations AwsOrganization[]
+  awsAccounts    AwsAccount[]
 
   @@map("organizations")
 }
@@ -142,6 +144,40 @@ model AwsConnection {
   @@index([organizationId])
   @@index([organizationId, status])
   @@map("aws_connections")
+}
+
+// NG-AWS-06: AWS inventory registry — NairaGuard org → many AWS organizations
+// → many AWS accounts. Never assume one workspace equals one AWS account.
+// Rows are discovered (validation org-discovery, later sync), never hand-typed;
+// accountId pairs are unique per workspace for tenant-safe scoping.
+model AwsOrganization {
+  id               String        @id @default(cuid())
+  organizationId   String
+  organization     Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  awsOrgId         String?
+  managementAccountId String?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  accounts         AwsAccount[]
+
+  @@index([organizationId])
+  @@map("aws_organizations")
+}
+
+model AwsAccount {
+  id                String           @id @default(cuid())
+  organizationId    String
+  organization      Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  awsOrganizationId String?
+  awsOrganization   AwsOrganization? @relation(fields: [awsOrganizationId], references: [id], onDelete: SetNull)
+  accountId         String
+  name              String?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  @@unique([organizationId, accountId])
+  @@index([organizationId])
+  @@map("aws_accounts")
 }
 
 model Membership {
