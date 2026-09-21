@@ -2,7 +2,10 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma/client";
 import { DemoCostProvider } from "@/infrastructure/providers/demo/cost-provider";
 import { normalizeCostResult } from "@/domain/costs/normalize";
+import type { DomainCost } from "@/domain/costs/types";
 import { toNairaEquivalent } from "@/domain/fx";
+import { getLatestFxSnapshot } from "@/lib/fx/snapshots";
+import { getLatestCostSnapshot, snapshotToCostView } from "@/lib/costs/snapshots";
 import { getDemoDataset } from "@/infrastructure/providers/demo/registry";
 import Link from "next/link";
 import { ServiceBreakdown } from "@/components/costs/service-breakdown";
@@ -20,11 +23,22 @@ export default async function CostsPage({ searchParams }: { searchParams: Promis
   const period = sp.period === "7" ? 7 : sp.period === "90" ? 90 : 30;
   const scenarioId = (sp.scenario as string) || "balanced-startup";
   const dataset = getDemoDataset(scenarioId);
-  const provider = new DemoCostProvider(scenarioId);
-  const raw = await provider.getCosts({ organizationId: membership.organizationId, periodDays: period });
-  const cost = normalizeCostResult(raw);
-  const fx = { rate: dataset.fx.usdNgn, observedAt: dataset.fx.observedAt, source: dataset.fx.provider };
-  const naira = toNairaEquivalent(cost.total, fx);
+  // NG-DASH-08: persisted snapshot first, provider fallback (same as dashboard).
+  const persistedCosts = await getLatestCostSnapshot(membership.organizationId).catch(() => null);
+  const persistedView = persistedCosts ? snapshotToCostView(persistedCosts, { organizationId: membership.organizationId, period }) : null;
+  let cost: DomainCost;
+  if (persistedView) {
+    cost = persistedView;
+  } else {
+    const provider = new DemoCostProvider(scenarioId);
+    const raw = await provider.getCosts({ organizationId: membership.organizationId, periodDays: period });
+    cost = normalizeCostResult(raw);
+  }
+  const pinnedFx = await getLatestFxSnapshot(membership.organizationId).catch(() => null);
+  const fx = pinnedFx
+    ? { rate: pinnedFx.rate, observedAt: pinnedFx.retrievedAt, source: pinnedFx.provider }
+    : { rate: dataset.fx.usdNgn, observedAt: dataset.fx.observedAt, source: dataset.fx.provider };
+  const naira = toNairaEquivalent(cost.total, fx, pinnedFx?.id ?? null);
 
   return (
     <div className="space-y-6">

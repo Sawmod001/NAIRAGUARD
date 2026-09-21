@@ -1,6 +1,35 @@
 import { prisma } from "@/lib/prisma/client";
 import type { DomainCost } from "@/domain/costs/types";
 
+const dollars = (cents: number) => Math.round(cents) / 100;
+
+/**
+ * Snapshot → DomainCost view for a display window — NG-DASH-08.
+ * Totals follow the visible window (same semantics as the provider path).
+ * Null when the snapshot carries no daily series; callers fall back.
+ */
+export function snapshotToCostView(
+  snapshot: CostSnapshotDTO,
+  input: { organizationId: string; period: number }
+): DomainCost | null {
+  if (snapshot.daily.length === 0) return null;
+  const window = snapshot.daily.slice(-Math.max(input.period, 1));
+  const windowCents = window.reduce((s, d) => s + d.amountCents, 0);
+  return {
+    organizationId: input.organizationId,
+    accountId: snapshot.accountId,
+    currency: "USD",
+    periodDays: input.period,
+    total: dollars(windowCents),
+    totalCents: windowCents,
+    daily: window.map((d) => ({ date: d.date, amount: dollars(d.amountCents), amountCents: d.amountCents, currency: "USD" as const })),
+    services: snapshot.services.map((s) => ({ service: s.service, amount: dollars(s.amountCents), amountCents: s.amountCents, currency: "USD" as const, percentage: s.percentage })),
+    regions: snapshot.regions.map((r) => ({ region: r.region, amount: dollars(r.amountCents), amountCents: r.amountCents, currency: "USD" as const, percentage: r.percentage })),
+    observedAt: snapshot.observedAt,
+    source: snapshot.source,
+  };
+}
+
 /**
  * Persisted cost snapshots — NG-COST-03
  * Server-side only. Writes normalized DomainCost (NG-COST-02, cents-based)

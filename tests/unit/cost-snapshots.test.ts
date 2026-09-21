@@ -16,7 +16,7 @@ vi.mock("@/lib/prisma/client", () => ({
   },
 }));
 
-import { getLatestCostSnapshot, saveCostSnapshot } from "@/lib/costs/snapshots";
+import { getLatestCostSnapshot, saveCostSnapshot, snapshotToCostView } from "@/lib/costs/snapshots";
 import type { DomainCost } from "@/domain/costs/types";
 
 /** NG-COST-03: snapshots persist cents + breakdowns, dedupe per run, latest reads back. */
@@ -107,6 +107,51 @@ describe("cost snapshots (NG-COST-03)", () => {
     expect(dto!.daily).toEqual([{ date: "2026-09-15", amountCents: 4784 }]);
     expect(dto!.services).toEqual([{ service: "EC2", amountCents: 57883, percentage: 42 }]);
     expect(dto!.regions).toEqual([{ region: "eu-west-1", amountCents: 71664, percentage: 52 }]);
+  });
+
+  it("builds windowed views from a snapshot (NG-DASH-08)", () => {
+    const dto = {
+      id: "snap-1",
+      organizationId: "org-1",
+      syncRunId: null,
+      accountId: "123456789012",
+      periodStart: "2026-09-06T00:00:00.000Z",
+      periodEnd: "2026-09-15T00:00:00.000Z",
+      periodDays: 10,
+      totalCents: 10000,
+      currency: "USD",
+      source: "DemoCostProvider",
+      observedAt: "2026-09-15T00:00:00.000Z",
+      daily: Array.from({ length: 10 }, (_, i) => ({ date: `2026-09-${String(i + 6).padStart(2, "0")}`, amountCents: 1000 })),
+      services: [{ service: "EC2", amountCents: 10000, percentage: 100 }],
+      regions: [{ region: "eu-west-1", amountCents: 10000, percentage: 100 }],
+    };
+    const view = snapshotToCostView(dto, { organizationId: "org-1", period: 7 })!;
+    expect(view.daily).toHaveLength(7);
+    expect(view.totalCents).toBe(7000);
+    expect(view.total).toBe(70);
+    expect(view.periodDays).toBe(7);
+    expect(view.services[0]).toMatchObject({ service: "EC2", amount: 100, amountCents: 10000 });
+  });
+
+  it("returns null for snapshots without a daily series", () => {
+    const dto = {
+      id: "snap-1",
+      organizationId: "org-1",
+      syncRunId: null,
+      accountId: null,
+      periodStart: "2026-09-15T00:00:00.000Z",
+      periodEnd: "2026-09-15T00:00:00.000Z",
+      periodDays: 1,
+      totalCents: 0,
+      currency: "USD",
+      source: "DemoCostProvider",
+      observedAt: "2026-09-15T00:00:00.000Z",
+      daily: [],
+      services: [],
+      regions: [],
+    };
+    expect(snapshotToCostView(dto, { organizationId: "org-1", period: 30 })).toBeNull();
   });
 
   it("returns null when no snapshot exists", async () => {

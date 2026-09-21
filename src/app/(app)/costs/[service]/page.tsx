@@ -2,6 +2,8 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma/client";
 import { DemoCostProvider } from "@/infrastructure/providers/demo/cost-provider";
 import { normalizeCostResult } from "@/domain/costs/normalize";
+import type { DomainCost } from "@/domain/costs/types";
+import { getLatestCostSnapshot, snapshotToCostView } from "@/lib/costs/snapshots";
 import Link from "next/link";
 
 function slugToService(slug: string): string {
@@ -25,9 +27,21 @@ export default async function ServiceDetailPage({ params, searchParams }: { para
   const membership = userId ? await prisma.membership.findFirst({ where: { userId } }) : null;
   if (!membership) return <div>Unauthorized</div>;
 
-  const provider = new DemoCostProvider(scenarioId);
-  const raw = await provider.getCosts({ organizationId: membership.organizationId });
-  const cost = normalizeCostResult(raw);
+  // NG-DASH-08: persisted snapshot first (full window for share math), provider fallback.
+  const persistedCosts = await getLatestCostSnapshot(membership.organizationId).catch(() => null);
+  let cost: DomainCost;
+  if (persistedCosts) {
+    const view = snapshotToCostView(persistedCosts, { organizationId: membership.organizationId, period: persistedCosts.periodDays });
+    if (view) {
+      cost = view;
+    } else {
+      const provider = new DemoCostProvider(scenarioId);
+      cost = normalizeCostResult(await provider.getCosts({ organizationId: membership.organizationId }));
+    }
+  } else {
+    const provider = new DemoCostProvider(scenarioId);
+    cost = normalizeCostResult(await provider.getCosts({ organizationId: membership.organizationId }));
+  }
   const svc = cost.services.find((s) => s.service === serviceName);
   if (!svc) return <div className="p-6">Service not found: {serviceName}</div>;
 

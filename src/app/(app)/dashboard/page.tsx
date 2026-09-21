@@ -6,7 +6,7 @@ import { normalizeCostResult } from "@/domain/costs/normalize";
 import { displayFxSource, toNairaEquivalent } from "@/domain/fx";
 import type { DomainCost } from "@/domain/costs/types";
 import { formatAge } from "@/domain/sync/runs";
-import { getLatestCostSnapshot } from "@/lib/costs/snapshots";
+import { getLatestCostSnapshot, snapshotToCostView } from "@/lib/costs/snapshots";
 import { getLatestFxSnapshot } from "@/lib/fx/snapshots";
 import { getWorkspaceFreshness } from "@/lib/dashboard/freshness";
 import { maskAwsAccountId } from "@/schemas/demo";
@@ -34,24 +34,10 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   // NG-DASH-07: persisted snapshot first (seeded at Connect), provider fallback.
   // Totals follow the visible window in both paths, matching provider semantics.
   const persistedCosts = membership ? await getLatestCostSnapshot(membership.organizationId).catch(() => null) : null;
-  const dollars = (cents: number) => Math.round(cents) / 100;
+  const persistedView = persistedCosts ? snapshotToCostView(persistedCosts, { organizationId: orgId, period }) : null;
   let cost: DomainCost;
-  if (persistedCosts && persistedCosts.daily.length > 0) {
-    const window = persistedCosts.daily.slice(-period);
-    const windowCents = window.reduce((s, d) => s + d.amountCents, 0);
-    cost = {
-      organizationId: orgId,
-      accountId: persistedCosts.accountId,
-      currency: "USD",
-      periodDays: period,
-      total: dollars(windowCents),
-      totalCents: windowCents,
-      daily: window.map((d) => ({ date: d.date, amount: dollars(d.amountCents), amountCents: d.amountCents, currency: "USD" as const })),
-      services: persistedCosts.services.map((s) => ({ service: s.service, amount: dollars(s.amountCents), amountCents: s.amountCents, currency: "USD" as const, percentage: s.percentage })),
-      regions: persistedCosts.regions.map((r) => ({ region: r.region, amount: dollars(r.amountCents), amountCents: r.amountCents, currency: "USD" as const, percentage: r.percentage })),
-      observedAt: persistedCosts.observedAt,
-      source: persistedCosts.source,
-    };
+  if (persistedView) {
+    cost = persistedView;
   } else {
     const rawCost = await costProvider.getCosts({ organizationId: orgId, periodDays: period });
     cost = normalizeCostResult(rawCost);
