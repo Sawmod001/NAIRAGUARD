@@ -4,7 +4,9 @@ import { DemoCostProvider } from "@/infrastructure/providers/demo/cost-provider"
 import { DemoOptimizationProvider } from "@/infrastructure/providers/demo/optimization-provider";
 import { normalizeCostResult } from "@/domain/costs/normalize";
 import { displayFxSource, toNairaEquivalent } from "@/domain/fx";
+import { formatAge } from "@/domain/sync/runs";
 import { getLatestFxSnapshot } from "@/lib/fx/snapshots";
+import { getWorkspaceFreshness } from "@/lib/dashboard/freshness";
 import { maskAwsAccountId } from "@/schemas/demo";
 import { aggregateSavings } from "@/domain/finops";
 import { prioritizeRecommendations } from "@/domain/optimizations";
@@ -49,7 +51,10 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   // SEE: previous period mock comparison (+4.2% vs previous)
   const prevDelta = period === 7 ? "+6.1%" : period === 90 ? "+2.4%" : "+4.2%";
   const fxAgeDays = Math.max(0, Math.floor((Date.now() - new Date(fx.observedAt).getTime()) / 86400000));
-  const syncedAgo = "2 min ago"; // demo
+  // NG-DASH-06: real freshness — latest sync run, snapshot, and live connection.
+  const freshness = membership ? await getWorkspaceFreshness(membership.organizationId).catch(() => null) : null;
+  const syncedAgo = freshness?.lastSyncAt ? formatAge(freshness.lastSyncAt) : null;
+  const lastSyncFailed = freshness?.lastSyncStatus === "FAILED" || freshness?.lastSyncStatus === "PARTIAL";
 
   const panel = "rounded-[8px] border border-[#E7E5E2] bg-[#FFFFFF] p-5 md:p-6";
 
@@ -61,8 +66,23 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
             <h1 className="font-display text-[28px] font-semibold leading-none tracking-tight text-[#0E0E0F]">Dashboard</h1>
             <p className="mt-1 text-sm text-[#6B6B6E]">Good morning, {name}. Here&apos;s what&apos;s happening across your AWS environment.</p>
             <div className="mt-2 inline-flex items-center gap-2 text-xs text-[#6B6B6E]">
-              <span className="h-2 w-2 rounded-full bg-[#E8622C]" aria-hidden /> Last synced {syncedAgo} · <span className="tabular-nums">{new Date().toLocaleDateString()}</span>
+              <span className="h-2 w-2 rounded-full bg-[#E8622C]" aria-hidden />{" "}
+              {syncedAgo ? (
+                <>Last synced {syncedAgo} · <span className="tabular-nums">{new Date().toLocaleDateString()}</span></>
+              ) : (
+                <>Not synced yet · <span className="tabular-nums">{new Date().toLocaleDateString()}</span></>
+              )}
+              {freshness?.connectionStatus && (
+                <span className="rounded-full border border-[#E7E5E2] bg-white px-2 py-0.5">
+                  AWS {freshness.connectionStatus.replace(/_/g, " ").toLowerCase()}
+                </span>
+              )}
             </div>
+            {lastSyncFailed && (
+              <div className="mt-2 rounded-[8px] border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+                Last sync {freshness?.lastSyncStatus?.toLowerCase()} — showing last-known-good data.
+              </div>
+            )}
           </div>
           <div className="flex flex-wrap items-center gap-2 text-xs">
             <span className="rounded-full bg-[#0E0E0F] px-3 py-1.5 text-white">{dataset.scenario.name}</span>
@@ -192,7 +212,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
             <div className={panel}>
               <div className="font-mono text-xs tracking-widest text-[#6B6B6E]">RECENT ACTIVITY</div>
               <div className="mt-3 space-y-3 text-sm">
-                <div className="flex gap-3"><span className="mt-1.5 h-2 w-2 rounded-full bg-[#E8622C]" aria-hidden /><div><div className="font-medium text-[#0E0E0F]">Cost data refreshed</div><div className="text-xs text-[#6B6B6E]">2 min ago · {period} days · {dataset.scenario.name}</div></div></div>
+                <div className="flex gap-3"><span className="mt-1.5 h-2 w-2 rounded-full bg-[#E8622C]" aria-hidden /><div><div className="font-medium text-[#0E0E0F]">Cost data refreshed</div><div className="text-xs text-[#6B6B6E]">{syncedAgo ?? "Not synced yet"} · {period} days · {dataset.scenario.name}</div></div></div>
                 <div className="flex gap-3"><span className="mt-1.5 h-2 w-2 rounded-full bg-[#E8622C]" aria-hidden /><div><div className="font-medium text-[#0E0E0F]">Optimization identified</div><div className="text-xs text-[#6B6B6E]">{recs[0]?.resourceId ?? "—"} · ${recs[0]?.estimatedMonthlySavingsUsd.toFixed(2) ?? "—"}/mo</div></div></div>
                 <div className="flex gap-3"><span className="mt-1.5 h-2 w-2 rounded-full bg-[#6B6B6E]" aria-hidden /><div><div className="font-medium text-[#0E0E0F]">FX rate recorded</div><div className="text-xs text-[#6B6B6E]">{new Date(fx.observedAt).toLocaleDateString()} · ₦{fx.rate.toLocaleString()}/USD · {fx.source}</div></div></div>
               </div>
@@ -214,7 +234,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
         </PanelErrorBoundary>
 
         <div className="rounded-[8px] border border-[#E7E5E2] bg-white px-4 py-3 text-xs leading-5 text-[#6B6B6E]">
-          <span className="font-mono tracking-widest">{dataset.scenario.name} · {dataset.scenario.accountName} {maskAwsAccountId(dataset.scenario.accountId)} ·</span> Last sync {syncedAgo} · FX ₦{fx.rate.toLocaleString()}/USD · <span className="font-medium">NGN estimates — not bank charges.</span> <Link href="/connections" className="text-[#E8622C] underline hover:text-[#0E0E0F]">How NairaGuard connects</Link>
+          <span className="font-mono tracking-widest">{dataset.scenario.name} · {dataset.scenario.accountName} {maskAwsAccountId(dataset.scenario.accountId)} ·</span> Last sync {syncedAgo ?? "never"} · FX ₦{fx.rate.toLocaleString()}/USD · <span className="font-medium">NGN estimates — not bank charges.</span> <Link href="/connections" className="text-[#E8622C] underline hover:text-[#0E0E0F]">How NairaGuard connects</Link>
         </div>
     </div>
   );

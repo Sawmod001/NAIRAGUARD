@@ -34,3 +34,26 @@ export function canTransitionRun(from: SyncRunStatus, to: SyncRunStatus): boolea
 export function isUsableRun(status: SyncRunStatus): boolean {
   return status === "SUCCEEDED" || status === "PARTIAL";
 }
+
+/** Data older than this reads as stale (NG-DASH-06). */
+export const FRESHNESS_STALE_AFTER_MS = 24 * 60 * 60 * 1000;
+
+/** Human age for freshness lines: "just now", "Xm ago", "Xh ago", "Xd ago". */
+export function formatAge(observedAtIso: string, nowMs: number = Date.now()): string {
+  const diff = Math.max(0, nowMs - new Date(observedAtIso).getTime());
+  const minutes = Math.floor(diff / 60_000);
+  if (minutes < 1) return "just now";
+  if (minutes < 60) return `${minutes} min ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  return `${Math.floor(hours / 24)}d ago`;
+}
+
+/** Whether an observation timestamp counts as stale right now. */
+export function isStaleObservation(
+  observedAtIso: string,
+  nowMs: number = Date.now(),
+  thresholdMs: number = FRESHNESS_STALE_AFTER_MS
+): boolean {
+  return nowMs - new Date(observedAtIso).getTime() > thresholdMs;
+}
