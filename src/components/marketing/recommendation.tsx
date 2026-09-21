@@ -9,7 +9,7 @@ export function RecommendationShowcase() {
               <div className="rounded-lg bg-zinc-50 p-4">
                 <div className="font-mono text-xs tracking-widest text-zinc-500">CURRENT</div>
                 <div className="mt-1 font-mono text-sm">m6i.2xlarge</div>
-                <div className="text-xs text-zinc-500">i-0demo001 • eu-west-1</div>
+                <div className="text-xs text-zinc-500">i-0a91f4c2 • eu-west-1</div>
               </div>
               <div className="rounded-lg bg-orange-50 p-4">
                 <div className="font-mono text-xs tracking-widest text-orange-700">RECOMMENDED</div>

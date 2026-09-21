@@ -52,6 +52,11 @@ export function SignInForm() {
           />
         </div>
         {error && <p className="text-sm text-red-600">{error}</p>}
+        <p className="text-right text-sm">
+          <a href="/forgot-password" className="font-medium text-black underline">
+            Forgot password?
+          </a>
+        </p>
         <button
           type="submit"
           disabled={loading}
@@ -61,7 +66,10 @@ export function SignInForm() {
         </button>
         <p className="text-center text-sm text-zinc-600">
           No account?{" "}
-          <a href="/sign-up" className="font-medium text-black underline">
+          <a
+            href={`/sign-up?callbackUrl=${encodeURIComponent(callbackUrl)}`}
+            className="font-medium text-black underline"
+          >
             Create one
           </a>
         </p>

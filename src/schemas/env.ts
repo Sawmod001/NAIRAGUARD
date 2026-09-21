@@ -71,6 +71,23 @@ export const serverEnvSchema = z
 
     // App URL (server copy)
     NEXT_PUBLIC_APP_URL: optionalNonEmpty,
+
+    // AWS — NairaGuard delivery account shown in the customer trust policy (NG-AWS-02).
+    // Empty until the delivery account exists; UI renders a marked placeholder instead.
+    AWS_NAIRAGUARD_ACCOUNT_ID: z
+      .string()
+      .trim()
+      .optional()
+      .transform((v) => (v === "" ? undefined : v))
+      .pipe(z.string().regex(/^\d{12}$/, "12-digit AWS account").optional()),
+
+    // AWS region for STS validation/sync clients (NG-AWS-03). Defaults in code to eu-west-1.
+    AWS_REGION: z
+      .string()
+      .trim()
+      .optional()
+      .transform((v) => (v === "" ? undefined : v))
+      .pipe(z.string().regex(/^[a-z]{2}-[a-z]+-\d$/, "AWS region like eu-west-1").optional()),
   })
   .superRefine((val, ctx) => {
     if (val.AI_MODE === "live" && !val.AI_PROVIDER_API_KEY) {

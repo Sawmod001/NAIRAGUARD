@@ -19,7 +19,7 @@ export function See() {
               <div className="flex justify-between"><span>RDS</span><span>18%</span></div>
               <div className="flex justify-between"><span>EBS</span><span>12%</span></div>
             </div>
-            <div className="mt-3 font-mono text-xs text-zinc-500">Freshness: 2026-09-15 • demo-fixture</div>
+            <div className="mt-3 font-mono text-xs text-zinc-500">Freshness: 2026-09-15 • recorded rate</div>
           </div>
           <div className="rounded-xl border border-zinc-200 bg-white p-5">
             <div className="font-mono text-xs tracking-widest text-zinc-500">REGIONAL</div>

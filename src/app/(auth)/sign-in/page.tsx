@@ -9,7 +9,7 @@ export default function SignInPage() {
       <div className="w-full max-w-md">
         <div className="mb-6 text-center">
           <h1 className="text-2xl font-semibold tracking-tight">Sign in to NairaGuard</h1>
-          <p className="mt-2 text-sm text-zinc-600">Secure session • Demo Mode ready after login</p>
+          <p className="mt-2 text-sm text-zinc-600">Secure session • Workspace ready after login</p>
         </div>
         <Suspense fallback={null}>
           <SignInForm />

@@ -15,7 +15,7 @@ export function DemoScenarioSwitcher() {
   const current = params.get("scenario") ?? "balanced-startup";
   return (
     <div className="flex items-center gap-2">
-      <span className="font-mono text-xs tracking-widest text-zinc-500">DEMO</span>
+      <span className="font-mono text-xs tracking-widest text-zinc-500">DATASET</span>
       <select
         value={current}
         onChange={(e) => {

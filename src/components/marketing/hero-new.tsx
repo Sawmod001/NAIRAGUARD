@@ -40,7 +40,7 @@ export function HeroNew() {
             <a href="/onboarding" className="rounded-full bg-white px-5 py-3 text-sm font-semibold text-black hover:bg-zinc-100">Try Demo</a>
             <a href="#how" className="rounded-full border border-zinc-700 px-5 py-3 text-sm font-medium hover:bg-zinc-900">See how it works</a>
           </div>
-          <div className="mt-3 font-mono text-xs tracking-wide text-zinc-500">Demo Mode · No AWS account required</div>
+          <div className="mt-3 font-mono text-xs tracking-wide text-zinc-500">Guided tour • No setup • Naira context included</div>
         </div>
 
         {/* Visual story — product UI + human context, not decorative */}
@@ -77,7 +77,7 @@ export function HeroNew() {
                 <div className="font-semibold">₦183,985</div>
               </div>
             </div>
-            <div className="mt-2 text-center font-mono text-[10px] tracking-widest text-zinc-500">DETERMINISTIC • 2026-09-15 • demo-fixture</div>
+            <div className="mt-2 text-center font-mono text-[10px] tracking-widest text-zinc-500">DETERMINISTIC • 2026-09-15 • RECORDED RATE</div>
           </div>
         </div>
       </div>

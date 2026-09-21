@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma/client";
 import { DemoOptimizationProvider } from "@/infrastructure/providers/demo/optimization-provider";
 import { getDemoDataset } from "@/infrastructure/providers/demo/registry";
+import { displayFxSource } from "@/domain/fx";
 
 export default async function ActivityPage({ searchParams }: { searchParams: Promise<{ scenario?: string }> }) {
   const sp = await searchParams;
@@ -32,8 +33,8 @@ export default async function ActivityPage({ searchParams }: { searchParams: Pro
   const events = dbEvents ?? [
     { time: "09:42", title: "Cost data refreshed", desc: `30 days · ${dataset.scenario.name} · $${dataset.cost.serviceBreakdown.reduce((s,x)=>s+x.amountUsd,0).toFixed(2)} processed`, date: "Today" },
     { time: "09:38", title: demoRecTitle, desc: demoRecDesc, date: "Today" },
-    { time: "Yesterday", title: "Demo scenario reviewed", desc: `${dataset.scenario.name} · ${scenarioId}`, date: "Yesterday" },
-    { time: new Date(dataset.fx.observedAt).toLocaleDateString(), title: "FX rate recorded", desc: `₦${dataset.fx.usdNgn.toLocaleString()}/USD · ${dataset.fx.provider} · not a bank charge`, date: new Date(dataset.fx.observedAt).toLocaleDateString() },
+    { time: "Yesterday", title: "Workspace reviewed", desc: `${dataset.scenario.name} · ${scenarioId}`, date: "Yesterday" },
+    { time: new Date(dataset.fx.observedAt).toLocaleDateString(), title: "FX rate recorded", desc: `₦${dataset.fx.usdNgn.toLocaleString()}/USD · ${displayFxSource(dataset.fx.provider)} · not a bank charge`, date: new Date(dataset.fx.observedAt).toLocaleDateString() },
   ];
 
   const groups = Array.from(new Set(events.map((e) => e.date)));
@@ -41,9 +42,9 @@ export default async function ActivityPage({ searchParams }: { searchParams: Pro
     <div className="space-y-6">
       <div>
         <h1 className="font-display text-2xl font-semibold tracking-tight">Activity</h1>
-        <p className="text-sm text-stone-500">Audit history for this workspace — cost refreshes, recommendations, scenario and FX events.</p>
+        <p className="text-sm text-stone-500">Audit history for this workspace — cost refreshes, recommendations, and FX events.</p>
       </div>
-      <div className="rounded-xl border border-stone-200 bg-amber-50 px-4 py-3 text-xs text-amber-800">Demo workspace — events are deterministic per scenario. Real AWS events will appear here after you connect an account.</div>
+      <div className="rounded-xl border border-stone-200 bg-amber-50 px-4 py-3 text-xs text-amber-800">Workspace activity — new events appear here as data syncs. Connect an AWS account for live events.</div>
       <div className="space-y-6">
         {groups.map((date) => (
           <div key={date}>

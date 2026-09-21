@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { signUp } from "@/lib/auth/actions";
 
 export function SignUpForm() {
   const router = useRouter();
+  const params = useSearchParams();
+  const callbackUrl = params.get("callbackUrl") || "/dashboard";
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -29,10 +31,11 @@ export function SignUpForm() {
     setLoading(false);
     if (si?.error) {
       setError("Account created. Please sign in.");
-      router.push("/sign-in");
+      router.push(`/sign-in?callbackUrl=${encodeURIComponent(callbackUrl)}`);
       return;
     }
-    router.push("/dashboard");
+    // NG-DEMO-06: honor Try Demo → sign-up → Connect step chain.
+    router.push(callbackUrl);
     router.refresh();
   }
 
@@ -90,7 +93,10 @@ export function SignUpForm() {
         </button>
         <p className="text-center text-sm text-zinc-600">
           Have an account?{" "}
-          <a href="/sign-in" className="font-medium text-black underline">
+          <a
+            href={`/sign-in?callbackUrl=${encodeURIComponent(callbackUrl)}`}
+            className="font-medium text-black underline"
+          >
             Sign in
           </a>
         </p>
