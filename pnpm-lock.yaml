@@ -169,6 +169,9 @@ importers:
       '@auth/prisma-adapter':
         specifier: ^2.11.3
         version: 2.11.3(@prisma/client@6.14.0(prisma@6.14.0(typescript@5.9.3))(typescript@5.9.3))
+      '@aws-sdk/client-cost-explorer':
+        specifier: ^3.1136.0
+        version: 3.1136.0
       '@aws-sdk/client-sts':
         specifier: 3.1136.0
         version: 3.1136.0
@@ -264,6 +267,10 @@ packages:
     resolution: {integrity: sha512-jZbpVAO6PTc9zNtdTWc0RLWG8qap4iMc54/3oWaWbuKdj92wHxzPrs3HivWB2mB9975GPW0l3YM/wFUWiUlTlg==}
     peerDependencies:
       '@prisma/client': '>=2.26.0 || >=3 || >=4 || >=5 || >=6'
+
+  '@aws-sdk/client-cost-explorer@3.1136.0':
+    resolution: {integrity: sha512-HoZOi4luWw6kb8F7CdgSzeFeftt8gtBRqmTwEAeMiKeiGMyzsgwB6Va9B+Gs2rXzLbTyOeXxB/4a6wjHnwh8VQ==}
+    engines: {node: '>=20.0.0'}
 
   '@aws-sdk/client-sts@3.1136.0':
     resolution: {integrity: sha512-6NfisbmH1dBbYy6UgLsaWpeVIfWqQc3j0GYLgV5ciDsthsYMcwlgZjfaoOVoctUhXzBU4Rw50GAqzDGTrgnS9A==}
@@ -3003,6 +3010,17 @@ snapshots:
       - '@simplewebauthn/browser'
       - '@simplewebauthn/server'
       - nodemailer
+
+  '@aws-sdk/client-cost-explorer@3.1136.0':
+    dependencies:
+      '@aws-sdk/core': 3.978.0
+      '@aws-sdk/credential-provider-node': 3.972.83
+      '@aws-sdk/types': 3.974.5
+      '@smithy/core': 3.34.1
+      '@smithy/fetch-http-handler': 5.8.0
+      '@smithy/node-http-handler': 4.12.1
+      '@smithy/types': 4.18.0
+      tslib: 2.8.1
 
   '@aws-sdk/client-sts@3.1136.0':
     dependencies:
