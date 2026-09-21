@@ -13,8 +13,28 @@ import {
 } from "@/domain/aws/iam";
 import { CopyBlock } from "@/components/ui/copy-block";
 import { ConnectForm, DisconnectButton, ValidateButton } from "./connect-form";
+import { getConnectionHealth, type AwsConnectionStatus } from "@/domain/aws/connection";
 
 const FAILURE_STATUSES = ["AUTH_FAILED", "PERMISSION_DENIED", "RATE_LIMITED", "ERROR"];
+
+/** NG-AWS-05: every state explains itself — meaning, next step, last validated. */
+function ConnectionHealthPanel({ status, lastValidatedAt }: { status: AwsConnectionStatus; lastValidatedAt: string | null }) {
+  const health = getConnectionHealth(status);
+  return (
+    <div className="mt-4 rounded-xl bg-stone-50 p-4">
+      <div className="font-mono text-[10px] tracking-widest text-stone-500">
+        CONNECTION HEALTH · {health.title.toUpperCase()}
+      </div>
+      <p className="mt-1.5 text-xs leading-5 text-stone-600">{health.whatItMeans}</p>
+      <p className="mt-1 text-xs leading-5 text-stone-600">
+        <span className="font-medium text-stone-900">Next:</span> {health.nextStep}
+      </p>
+      <div className="mt-2 font-mono text-[11px] text-stone-500">
+        Last validated: {lastValidatedAt ? new Date(lastValidatedAt).toLocaleString() : "never"}
+      </div>
+    </div>
+  );
+}
 
 export default async function ConnectionsPage() {
   // NG-DEMO-02: seeded workspace account (single Production Account; multi-account arrives with live AWS).
@@ -69,6 +89,12 @@ export default async function ConnectionsPage() {
               <div className="mt-1 font-mono text-xs leading-5 text-stone-600">{live.roleArn}</div>
               <DisconnectButton />
             </>
+          )}
+          {live && live.status !== "DISCONNECTED" && (
+            <ConnectionHealthPanel
+              status={live.status as AwsConnectionStatus}
+              lastValidatedAt={live.lastValidatedAt?.toISOString() ?? null}
+            />
           )}
         </div>
         <div className="rounded-2xl border border-stone-200 bg-white p-6">

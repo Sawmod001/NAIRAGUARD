@@ -86,3 +86,95 @@ export function canTransition(from: AwsConnectionStatus, to: AwsConnectionStatus
 export function generateExternalId(): string {
   return `ng_${randomBytes(12).toString("hex")}`;
 }
+
+export type ConnectionHealthTone = "ok" | "warn" | "error" | "muted";
+
+export type ConnectionHealth = {
+  tone: ConnectionHealthTone;
+  title: string;
+  whatItMeans: string;
+  nextStep: string;
+};
+
+/**
+ * NG-AWS-05: every connection state explains itself — what it means and what
+ * to do next. Rendered on Connections; dashboard freshness arrives in NG-DASH-06.
+ */
+export const CONNECTION_HEALTH: Record<AwsConnectionStatus, ConnectionHealth> = {
+  NOT_CONNECTED: {
+    tone: "muted",
+    title: "Not connected",
+    whatItMeans: "No AWS role has been entered for this workspace yet.",
+    nextStep: "Enter a Role ARN below to create the connection.",
+  },
+  PENDING: {
+    tone: "warn",
+    title: "Validation pending",
+    whatItMeans: "The role is recorded but NairaGuard has not proven it can assume it yet.",
+    nextStep: "Paste the workspace External ID into the role trust policy, then run validation.",
+  },
+  VALIDATING: {
+    tone: "warn",
+    title: "Validating",
+    whatItMeans: "NairaGuard is assuming the role with STS right now.",
+    nextStep: "Wait a few seconds, then refresh. Stuck here means a retry is safe.",
+  },
+  CONNECTED: {
+    tone: "ok",
+    title: "Connected",
+    whatItMeans: "The role was assumed successfully. Cost sync can run against this connection.",
+    nextStep: "Sync arrives with the data pipeline — nothing to fix.",
+  },
+  SYNCING: {
+    tone: "ok",
+    title: "Syncing",
+    whatItMeans: "Cost and recommendation data is being pulled into the workspace snapshot.",
+    nextStep: "Wait for the run to finish; last-known-good data stays visible meanwhile.",
+  },
+  SYNCED: {
+    tone: "ok",
+    title: "Synced",
+    whatItMeans: "The latest sync completed and the workspace shows persisted AWS data.",
+    nextStep: "Check freshness timestamps on the dashboard.",
+  },
+  STALE: {
+    tone: "warn",
+    title: "Stale",
+    whatItMeans: "Showing the last-known-good snapshot — newer AWS data could not be pulled.",
+    nextStep: "Re-run sync from the dashboard when available, or check the last error below.",
+  },
+  AUTH_FAILED: {
+    tone: "error",
+    title: "Authentication failed",
+    whatItMeans: "AWS refused the AssumeRole call — wrong trust policy, External ID, or deleted role.",
+    nextStep: "Fix the trust relationship in your AWS account, then retry validation.",
+  },
+  PERMISSION_DENIED: {
+    tone: "error",
+    title: "Permission denied",
+    whatItMeans: "The role is assumable but lacks one or more required read permissions.",
+    nextStep: "Attach the missing actions from the setup guide policy, then retry validation.",
+  },
+  RATE_LIMITED: {
+    tone: "warn",
+    title: "Rate limited",
+    whatItMeans: "AWS throttled the request. Nothing is misconfigured.",
+    nextStep: "Wait a minute and retry — backoff is automatic on sync runs.",
+  },
+  ERROR: {
+    tone: "error",
+    title: "Error",
+    whatItMeans: "Something unexpected happened (network, timeout, or AWS-side fault).",
+    nextStep: "Retry once. If it persists, re-enter the Role ARN to start clean.",
+  },
+  DISCONNECTED: {
+    tone: "muted",
+    title: "Disconnected",
+    whatItMeans: "A previous connection was closed. It no longer syncs or validates.",
+    nextStep: "Enter a Role ARN to connect again.",
+  },
+};
+
+export function getConnectionHealth(status: AwsConnectionStatus): ConnectionHealth {
+  return CONNECTION_HEALTH[status];
+}

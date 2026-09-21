@@ -26,11 +26,40 @@ export type ConnectionDTO = {
   status: string;
   roleArn: string | null;
   externalId: string;
+  lastValidatedAt: string | null;
+  lastError: string | null;
   updatedAt: string;
 };
 
-function toDTO(c: { id: string; status: string; roleArn: string | null; externalId: string; updatedAt: Date }): ConnectionDTO {
-  return { id: c.id, status: c.status, roleArn: c.roleArn, externalId: c.externalId, updatedAt: c.updatedAt.toISOString() };
+function toDTO(c: {
+  id: string;
+  status: string;
+  roleArn: string | null;
+  externalId: string;
+  lastValidatedAt: Date | null;
+  lastError: string | null;
+  updatedAt: Date;
+}): ConnectionDTO {
+  return {
+    id: c.id,
+    status: c.status,
+    roleArn: c.roleArn,
+    externalId: c.externalId,
+    lastValidatedAt: c.lastValidatedAt?.toISOString() ?? null,
+    lastError: c.lastError,
+    updatedAt: c.updatedAt.toISOString(),
+  };
+}
+
+/** NG-AWS-05: session-scoped read of the workspace's latest connection. */
+export async function getConnection(): Promise<{ ok: true; connection: ConnectionDTO | null }> {
+  const { userId } = await requireAuth();
+  const org = await ensurePersonalOrganization(userId);
+  const latest = await prisma.awsConnection.findFirst({
+    where: { organizationId: org.id },
+    orderBy: { updatedAt: "desc" },
+  });
+  return { ok: true, connection: latest ? toDTO(latest) : null };
 }
 
 async function clientId(prefix: string): Promise<string> {

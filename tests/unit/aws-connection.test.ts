@@ -4,6 +4,7 @@ import {
   canStartSync,
   canTransition,
   generateExternalId,
+  getConnectionHealth,
   isConnectionFailure,
   isConnectionReadable,
   type AwsConnectionStatus,
@@ -66,6 +67,19 @@ describe("aws connection lifecycle (NG-AWS-01)", () => {
     expect(canStartSync("SYNCING")).toBe(false);
     expect(canStartSync("PENDING")).toBe(false);
     expect(canStartSync("AUTH_FAILED")).toBe(false);
+  });
+
+  it("every state explains itself with a valid tone (NG-AWS-05)", () => {
+    for (const status of AWS_CONNECTION_STATUSES) {
+      const health = getConnectionHealth(status);
+      expect(["ok", "warn", "error", "muted"]).toContain(health.tone);
+      expect(health.title.length).toBeGreaterThan(0);
+      expect(health.whatItMeans.length).toBeGreaterThan(0);
+      expect(health.nextStep.length).toBeGreaterThan(0);
+    }
+    expect(getConnectionHealth("AUTH_FAILED").tone).toBe("error");
+    expect(getConnectionHealth("SYNCED").tone).toBe("ok");
+    expect(getConnectionHealth("PENDING").tone).toBe("warn");
   });
 
   it("generates unique opaque external ids", () => {
