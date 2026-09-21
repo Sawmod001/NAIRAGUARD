@@ -107,6 +107,7 @@ model Organization {
   awsOrganizations AwsOrganization[]
   awsAccounts    AwsAccount[]
   syncRuns       SyncRun[]
+  costSnapshots  CostSnapshot[]
 
   @@map("organizations")
 }
@@ -212,10 +213,49 @@ model SyncRun {
   recordCounts   Json?
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
+  snapshots      CostSnapshot[]
 
   @@index([organizationId, createdAt])
   @@index([organizationId, status])
   @@map("sync_runs")
+}
+
+// NG-COST-03: persisted normalized cost snapshots. Readers serve the latest
+// snapshot — never live-fetch per request. Append-only: a bad sync writes
+// nothing (runner records FAILED instead), so history stays trustworthy.
+// Money is integer cents (NG-201); percentages ride along for display.
+model CostSnapshot {
+  id             String          @id @default(cuid())
+  organizationId String
+  organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  syncRunId      String?
+  syncRun        SyncRun?        @relation(fields: [syncRunId], references: [id], onDelete: SetNull)
+  accountId      String?
+  periodStart    DateTime
+  periodEnd      DateTime
+  totalCents     Int
+  currency       String          @default("USD")
+  source         String
+  observedAt     DateTime
+  createdAt      DateTime        @default(now())
+  breakdowns     CostBreakdown[]
+
+  @@index([organizationId, observedAt])
+  @@index([syncRunId])
+  @@map("cost_snapshots")
+}
+
+model CostBreakdown {
+  id          String       @id @default(cuid())
+  snapshotId  String
+  snapshot    CostSnapshot @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
+  kind        String
+  key         String
+  amountCents Int
+  percentage  Float
+
+  @@index([snapshotId, kind])
+  @@map("cost_breakdowns")
 }
 
 model Membership {
