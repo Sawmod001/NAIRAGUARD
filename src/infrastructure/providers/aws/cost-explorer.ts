@@ -9,6 +9,7 @@ import { AppError } from "@/lib/errors/app-error";
 import { ErrorCode } from "@/lib/errors/codes";
 import { isRetryableSyncError, isThrottledError, withRetry } from "@/domain/sync/retry";
 import type { CostProvider, CostQuery, CostResult } from "@/infrastructure/providers/cost-provider";
+import type { AwsTempCredentials } from "./credentials";
 
 /**
  * Cost Explorer adapter — NG-COST-01
@@ -25,11 +26,7 @@ const CE_REGION = "us-east-1";
 const CALL_TIMEOUT_MS = 25_000;
 const MAX_PERIOD_DAYS = 90;
 
-export type CeCredentials = {
-  accessKeyId: string;
-  secretAccessKey: string;
-  sessionToken: string;
-};
+export type CeCredentials = AwsTempCredentials;
 
 function toISODate(d: Date): string {
   return d.toISOString().slice(0, 10);
