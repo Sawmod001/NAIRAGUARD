@@ -16,13 +16,32 @@ export type CostSnapshotDTO = {
   accountId: string | null;
   periodStart: string;
   periodEnd: string;
+  periodDays: number;
   totalCents: number;
   currency: string;
   source: string;
   observedAt: string;
+  daily: { date: string; amountCents: number }[];
   services: { service: string; amountCents: number; percentage: number }[];
   regions: { region: string; amountCents: number; percentage: number }[];
 };
+
+function toDailyJson(daily: { date: string; amountCents: number }[]): { date: string; amountCents: number }[] {
+  return daily.slice(-90).map((d) => ({ date: d.date, amountCents: d.amountCents }));
+}
+
+function fromDailyJson(raw: unknown): { date: string; amountCents: number }[] {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .filter(
+      (d): d is { date: string; amountCents: number } =>
+        typeof d === "object" &&
+        d !== null &&
+        typeof (d as { date?: unknown }).date === "string" &&
+        typeof (d as { amountCents?: unknown }).amountCents === "number"
+    )
+    .map((d) => ({ date: d.date, amountCents: d.amountCents }));
+}
 
 export async function saveCostSnapshot(input: {
   organizationId: string;
@@ -47,10 +66,12 @@ export async function saveCostSnapshot(input: {
         accountId: input.cost.accountId,
         periodStart: new Date(input.periodStart),
         periodEnd: new Date(input.periodEnd),
+        periodDays: input.cost.periodDays,
         totalCents: input.cost.totalCents,
         currency: input.cost.currency,
         source: input.cost.source,
         observedAt: new Date(input.cost.observedAt),
+        daily: toDailyJson(input.cost.daily),
       },
       select: { id: true },
     });
@@ -92,10 +113,12 @@ export async function getLatestCostSnapshot(organizationId: string): Promise<Cos
     accountId: snapshot.accountId,
     periodStart: snapshot.periodStart.toISOString(),
     periodEnd: snapshot.periodEnd.toISOString(),
+    periodDays: snapshot.periodDays,
     totalCents: snapshot.totalCents,
     currency: snapshot.currency,
     source: snapshot.source,
     observedAt: snapshot.observedAt.toISOString(),
+    daily: fromDailyJson(snapshot.daily),
     services: snapshot.breakdowns
       .filter((b) => b.kind === "service")
       .map((b) => ({ service: b.key, amountCents: b.amountCents, percentage: b.percentage })),

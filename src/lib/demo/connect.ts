@@ -7,6 +7,9 @@ import { AppError } from "@/lib/errors/app-error";
 import { ErrorCode } from "@/lib/errors/codes";
 import { checkRateLimit, RatePresets } from "@/lib/rate-limit";
 import { saveFxSnapshot } from "@/lib/fx/snapshots";
+import { saveCostSnapshot } from "@/lib/costs/snapshots";
+import { normalizeCostResult } from "@/domain/costs/normalize";
+import { DemoCostProvider } from "@/infrastructure/providers/demo/cost-provider";
 import { getDemoDataset } from "@/infrastructure/providers/demo/registry";
 
 /**
@@ -40,15 +43,26 @@ export async function connectToDemo(): Promise<
       },
     });
     // NG-FX-04: pin the workspace FX rate so every NGN estimate traces to a snapshot row.
+    // NG-DASH-07: persist the seed cost snapshot so the dashboard reads stored data.
     try {
-      const seed = getDemoDataset("balanced-startup").fx;
+      const dataset = getDemoDataset("balanced-startup");
       await saveFxSnapshot({
         organizationId: org.id,
-        rate: { base: "USD", quote: "NGN", rate: seed.usdNgn, provider: seed.provider, observedAt: seed.observedAt },
+        rate: { base: "USD", quote: "NGN", rate: dataset.fx.usdNgn, provider: dataset.fx.provider, observedAt: dataset.fx.observedAt },
         source: "workspace seed",
       });
+      const seedCost = await new DemoCostProvider("balanced-startup").getCosts({ organizationId: org.id, periodDays: 30 });
+      const normalized = normalizeCostResult(seedCost);
+      const end = new Date();
+      const start = new Date(end.getTime() - 30 * 86_400_000);
+      await saveCostSnapshot({
+        organizationId: org.id,
+        periodStart: start.toISOString(),
+        periodEnd: end.toISOString(),
+        cost: normalized,
+      });
     } catch (seedError) {
-      console.error("[NG-FX-04] workspace FX seed failed (non-blocking):", seedError);
+      console.error("[NG-DASH-07] workspace seed failed (non-blocking):", seedError);
     }
     return { ok: true, organizationId: org.id, organizationName: org.name, alreadyConnected: false };
   } catch (e) {

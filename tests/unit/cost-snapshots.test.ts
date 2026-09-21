@@ -28,7 +28,7 @@ describe("cost snapshots (NG-COST-03)", () => {
     periodDays: 30,
     total: 1378.16,
     totalCents: 137816,
-    daily: [],
+    daily: [{ date: "2026-09-15", amount: 47.84, amountCents: 4784, currency: "USD" as const }],
     services: [{ service: "EC2", amount: 578.83, amountCents: 57883, currency: "USD", percentage: 42 }],
     regions: [{ region: "eu-west-1", amount: 716.64, amountCents: 71664, currency: "USD", percentage: 52 }],
     observedAt: "2026-09-15T00:00:00.000Z",
@@ -55,7 +55,8 @@ describe("cost snapshots (NG-COST-03)", () => {
     expect(res).toEqual({ id: "snap-1", deduped: false });
     expect(mockTx.costSnapshot.create).toHaveBeenCalledOnce();
     const created = mockTx.costSnapshot.create.mock.calls[0]![0];
-    expect(created.data).toMatchObject({ totalCents: 137816, currency: "USD", source: "DemoCostProvider" });
+    expect(created.data).toMatchObject({ totalCents: 137816, currency: "USD", source: "DemoCostProvider", periodDays: 30 });
+    expect(created.data.daily).toEqual([{ date: "2026-09-15", amountCents: 4784 }]);
     const rows = mockTx.costBreakdown.createMany.mock.calls[0]![0].data;
     expect(rows).toHaveLength(2);
     expect(rows).toContainEqual(
@@ -89,6 +90,8 @@ describe("cost snapshots (NG-COST-03)", () => {
       accountId: "123456789012",
       periodStart: new Date("2026-08-16T00:00:00.000Z"),
       periodEnd: new Date("2026-09-15T00:00:00.000Z"),
+      periodDays: 30,
+      daily: [{ date: "2026-09-15", amountCents: 4784 }],
       totalCents: 137816,
       currency: "USD",
       source: "DemoCostProvider",
@@ -101,6 +104,7 @@ describe("cost snapshots (NG-COST-03)", () => {
     } as never);
     const dto = await getLatestCostSnapshot("org-1");
     expect(dto).toMatchObject({ id: "snap-1", totalCents: 137816 });
+    expect(dto!.daily).toEqual([{ date: "2026-09-15", amountCents: 4784 }]);
     expect(dto!.services).toEqual([{ service: "EC2", amountCents: 57883, percentage: 42 }]);
     expect(dto!.regions).toEqual([{ region: "eu-west-1", amountCents: 71664, percentage: 52 }]);
   });

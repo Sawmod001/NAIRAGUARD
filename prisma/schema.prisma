@@ -236,11 +236,15 @@ model CostSnapshot {
   accountId      String?
   periodStart    DateTime
   periodEnd      DateTime
+  periodDays     Int             @default(30)
   totalCents     Int
   currency       String          @default("USD")
   source         String
   observedAt     DateTime
   createdAt      DateTime        @default(now())
+  // Bounded daily series (≤90 { date, amountCents }) so readers render trends
+  // without re-fetching. Breakdowns stay relational for querying.
+  daily          Json?
   breakdowns     CostBreakdown[]
 
   @@index([organizationId, observedAt])

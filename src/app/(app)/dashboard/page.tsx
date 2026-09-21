@@ -4,7 +4,9 @@ import { DemoCostProvider } from "@/infrastructure/providers/demo/cost-provider"
 import { DemoOptimizationProvider } from "@/infrastructure/providers/demo/optimization-provider";
 import { normalizeCostResult } from "@/domain/costs/normalize";
 import { displayFxSource, toNairaEquivalent } from "@/domain/fx";
+import type { DomainCost } from "@/domain/costs/types";
 import { formatAge } from "@/domain/sync/runs";
+import { getLatestCostSnapshot } from "@/lib/costs/snapshots";
 import { getLatestFxSnapshot } from "@/lib/fx/snapshots";
 import { getWorkspaceFreshness } from "@/lib/dashboard/freshness";
 import { maskAwsAccountId } from "@/schemas/demo";
@@ -29,8 +31,31 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   const costProvider = new DemoCostProvider(scenarioId);
   const optProvider = new DemoOptimizationProvider(scenarioId);
   const orgId = membership?.organizationId ?? "demo";
-  const rawCost = await costProvider.getCosts({ organizationId: orgId, periodDays: period });
-  const cost = normalizeCostResult(rawCost);
+  // NG-DASH-07: persisted snapshot first (seeded at Connect), provider fallback.
+  // Totals follow the visible window in both paths, matching provider semantics.
+  const persistedCosts = membership ? await getLatestCostSnapshot(membership.organizationId).catch(() => null) : null;
+  const dollars = (cents: number) => Math.round(cents) / 100;
+  let cost: DomainCost;
+  if (persistedCosts && persistedCosts.daily.length > 0) {
+    const window = persistedCosts.daily.slice(-period);
+    const windowCents = window.reduce((s, d) => s + d.amountCents, 0);
+    cost = {
+      organizationId: orgId,
+      accountId: persistedCosts.accountId,
+      currency: "USD",
+      periodDays: period,
+      total: dollars(windowCents),
+      totalCents: windowCents,
+      daily: window.map((d) => ({ date: d.date, amount: dollars(d.amountCents), amountCents: d.amountCents, currency: "USD" as const })),
+      services: persistedCosts.services.map((s) => ({ service: s.service, amount: dollars(s.amountCents), amountCents: s.amountCents, currency: "USD" as const, percentage: s.percentage })),
+      regions: persistedCosts.regions.map((r) => ({ region: r.region, amount: dollars(r.amountCents), amountCents: r.amountCents, currency: "USD" as const, percentage: r.percentage })),
+      observedAt: persistedCosts.observedAt,
+      source: persistedCosts.source,
+    };
+  } else {
+    const rawCost = await costProvider.getCosts({ organizationId: orgId, periodDays: period });
+    cost = normalizeCostResult(rawCost);
+  }
   const recs = await optProvider.getRecommendations({ organizationId: orgId });
   const prioritized = prioritizeRecommendations(recs);
   // NG-FX-04: prefer the pinned workspace snapshot so NGN estimates trace to a row;
