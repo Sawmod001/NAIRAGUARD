@@ -2,8 +2,47 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createConnection, disconnectConnection, type ConnectionDTO } from "@/lib/aws/connections";
+import { createConnection, disconnectConnection, validateConnection, type ConnectionDTO } from "@/lib/aws/connections";
 import { CopyBlock } from "@/components/ui/copy-block";
+
+/** Manual validation run — NG-AWS-03. Runs after the trust policy carries the External ID. */
+export function ValidateButton() {
+  const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  async function onValidate() {
+    setError(null);
+    setLoading(true);
+    try {
+      const res = await validateConnection();
+      setLoading(false);
+      if (!res.ok) {
+        setError(res.error);
+        router.refresh();
+        return;
+      }
+      router.refresh();
+    } catch {
+      setError("Something went wrong. Please try again.");
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="mt-3">
+      <button
+        type="button"
+        onClick={onValidate}
+        disabled={loading}
+        className="rounded-full bg-zinc-900 px-5 py-2 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50"
+      >
+        {loading ? "Validating with AWS…" : "Run validation"}
+      </button>
+      {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+    </div>
+  );
+}
 
 /** Role ARN entry — NG-AWS-04. Shape-checked here, STS-verified in NG-AWS-03. */
 export function ConnectForm() {

@@ -8,6 +8,9 @@ import { AppError } from "@/lib/errors/app-error";
 import { ErrorCode } from "@/lib/errors/codes";
 import { checkRateLimit, RatePresets } from "@/lib/rate-limit";
 import { canTransition, generateExternalId, type AwsConnectionStatus } from "@/domain/aws/connection";
+import { parseRoleArn } from "@/domain/aws/iam";
+import { StsValidationError, validateRoleAssumable } from "@/infrastructure/providers/aws/sts";
+import { getEnv } from "@/lib/env/server";
 import { roleArnSchema } from "@/schemas/aws";
 
 /**
@@ -88,6 +91,75 @@ export async function createConnection(
   } catch (e) {
     if (e instanceof AppError) throw e;
     throw new AppError({ code: ErrorCode.DB_FAILURE, message: "Could not create connection.", cause: e });
+  }
+}
+
+const VALIDATABLE_STATUSES: AwsConnectionStatus[] = ["PENDING", "AUTH_FAILED", "PERMISSION_DENIED", "RATE_LIMITED", "ERROR"];
+
+function friendlyValidationMessage(status: string): string {
+  if (status === "AUTH_FAILED") return "AWS refused the role. Check the trust policy and External ID, then retry.";
+  if (status === "RATE_LIMITED") return "AWS throttled the request. Wait a minute and retry.";
+  return "Validation failed unexpectedly. Try again.";
+}
+
+/**
+ * NG-AWS-03: prove the stored Role ARN is assumable with the workspace External ID.
+ * Temporary credentials are used inside the STS wrapper and dropped — never stored.
+ */
+export async function validateConnection(): Promise<
+  { ok: true; connection: ConnectionDTO } | { ok: false; error: string; status?: string }
+> {
+  const { userId } = await requireAuth();
+  const rl = checkRateLimit(await clientId("action:validateConnection"), RatePresets.auth.limit, RatePresets.auth.windowMs);
+  if (!rl.allowed) return { ok: false, error: "Too many attempts. Please wait and try again." };
+
+  try {
+    const org = await ensurePersonalOrganization(userId);
+    const latest = await prisma.awsConnection.findFirst({
+      where: { organizationId: org.id },
+      orderBy: { updatedAt: "desc" },
+    });
+    if (!latest || !VALIDATABLE_STATUSES.includes(latest.status as AwsConnectionStatus)) {
+      return { ok: false, error: "Nothing to validate right now." };
+    }
+    if (!latest.roleArn) return { ok: false, error: "No Role ARN on this connection. Enter one first." };
+    if (!canTransition(latest.status as AwsConnectionStatus, "VALIDATING")) {
+      return { ok: false, error: "Validation already in progress. Try again shortly." };
+    }
+    await prisma.awsConnection.update({ where: { id: latest.id }, data: { status: "VALIDATING" } });
+
+    try {
+      const expectedAccount = parseRoleArn(latest.roleArn)?.accountId;
+      const region = getEnv().AWS_REGION ?? "eu-west-1";
+      const { accountId } = await validateRoleAssumable({
+        roleArn: latest.roleArn,
+        externalId: latest.externalId,
+        region,
+      });
+      if (expectedAccount && accountId !== expectedAccount) {
+        await prisma.awsConnection.update({
+          where: { id: latest.id },
+          data: { status: "AUTH_FAILED", lastError: "Assumed role account does not match the stored Role ARN." },
+        });
+        return { ok: false, error: "AWS refused the role. Check the trust policy and External ID, then retry.", status: "AUTH_FAILED" };
+      }
+      const connected = await prisma.awsConnection.update({
+        where: { id: latest.id },
+        data: { status: "CONNECTED", lastValidatedAt: new Date(), lastError: null },
+      });
+      return { ok: true, connection: toDTO(connected) };
+    } catch (e) {
+      const status = e instanceof StsValidationError ? e.status : ("ERROR" as const);
+      const raw = e instanceof Error ? e.message : "Unknown validation failure.";
+      await prisma.awsConnection.update({
+        where: { id: latest.id },
+        data: { status, lastError: raw.slice(0, 500) },
+      });
+      return { ok: false, error: friendlyValidationMessage(status), status };
+    }
+  } catch (e) {
+    if (e instanceof AppError) throw e;
+    throw new AppError({ code: ErrorCode.DB_FAILURE, message: "Could not validate connection.", cause: e });
   }
 }
 

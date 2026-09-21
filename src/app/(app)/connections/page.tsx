@@ -12,7 +12,7 @@ import {
   TRUST_EXPECTATIONS,
 } from "@/domain/aws/iam";
 import { CopyBlock } from "@/components/ui/copy-block";
-import { ConnectForm, DisconnectButton } from "./connect-form";
+import { ConnectForm, DisconnectButton, ValidateButton } from "./connect-form";
 
 const FAILURE_STATUSES = ["AUTH_FAILED", "PERMISSION_DENIED", "RATE_LIMITED", "ERROR"];
 
@@ -52,13 +52,15 @@ export default async function ConnectionsPage() {
               <div className="mt-2 flex items-center gap-2 text-sm font-medium"><span className="h-2 w-2 rounded-full bg-sky-500" aria-hidden /> Validation pending</div>
               <div className="mt-1 font-mono text-xs leading-5 text-stone-600">{live.roleArn}</div>
               <div className="mt-3"><CopyBlock label="WORKSPACE EXTERNAL ID" value={live.externalId} /></div>
-              <div className="mt-3 text-xs leading-5 text-stone-600">Paste this ID into the role&apos;s trust policy. Automatic validation runs in the next update.</div>
+              <div className="mt-3 text-xs leading-5 text-stone-600">Paste this ID into the role&apos;s trust policy, then run validation.</div>
+              <ValidateButton />
               <DisconnectButton />
             </>
           ) : FAILURE_STATUSES.includes(live.status) ? (
             <>
               <div className="mt-2 flex items-center gap-2 text-sm font-medium"><span className="h-2 w-2 rounded-full bg-red-500" aria-hidden /> {live.status.replace(/_/g, " ")}</div>
               <div className="mt-1 text-sm leading-6 text-stone-600">{live.lastError ?? "The last attempt failed. Check the role and try again with a corrected ARN."}</div>
+              <ValidateButton />
               <ConnectForm />
             </>
           ) : (
@@ -103,7 +105,7 @@ function IamSetupGuide() {
       <h2 className="mt-2 text-lg font-semibold tracking-tight">Grant read-only access with an IAM role</h2>
       <p className="mt-1 max-w-2xl text-sm leading-6 text-stone-600">
         NairaGuard reads your account through a cross-account IAM role with short-lived STS credentials.
-        Do not create access keys. Your workspace External ID is issued when connecting — role validation arrives in the next update.
+        Do not create access keys. Your workspace External ID is issued when connecting — enter the Role ARN above, update the trust policy, then run validation.
       </p>
 
       <ol className="mt-5 space-y-5">
