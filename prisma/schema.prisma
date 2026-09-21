@@ -106,6 +106,7 @@ model Organization {
   awsConnections AwsConnection[]
   awsOrganizations AwsOrganization[]
   awsAccounts    AwsAccount[]
+  syncRuns       SyncRun[]
 
   @@map("organizations")
 }
@@ -138,8 +139,9 @@ model AwsConnection {
   status          AwsConnectionStatus @default(NOT_CONNECTED)
   lastValidatedAt DateTime?
   lastError       String?
-  createdAt       DateTime            @default(now())
-  updatedAt       DateTime            @updatedAt
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  syncRuns        SyncRun[]
 
   @@index([organizationId])
   @@index([organizationId, status])
@@ -178,6 +180,42 @@ model AwsAccount {
   @@unique([organizationId, accountId])
   @@index([organizationId])
   @@map("aws_accounts")
+}
+
+// NG-SYNC-01: persisted sync runs. Dashboard reads normalized persisted data;
+// a failed run never destroys the last-known-good dataset (runs are append-only).
+// Normalized cost/optimization records arrive in NG-COST-02/03 + NG-OPT-03.
+enum SyncRunStatus {
+  QUEUED
+  RUNNING
+  SUCCEEDED
+  PARTIAL
+  FAILED
+}
+
+enum SyncSource {
+  DEMO
+  AWS
+}
+
+model SyncRun {
+  id             String        @id @default(cuid())
+  organizationId String
+  organization   Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  awsConnectionId String?
+  awsConnection  AwsConnection? @relation(fields: [awsConnectionId], references: [id], onDelete: SetNull)
+  source         SyncSource
+  status         SyncRunStatus @default(QUEUED)
+  startedAt      DateTime?
+  finishedAt     DateTime?
+  error          String?
+  recordCounts   Json?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([organizationId, createdAt])
+  @@index([organizationId, status])
+  @@map("sync_runs")
 }
 
 model Membership {
