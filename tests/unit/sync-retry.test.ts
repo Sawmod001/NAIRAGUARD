@@ -42,7 +42,7 @@ describe("sync retry policy (NG-SYNC-03)", () => {
   });
 
   it("retries throttles with jittered waits then succeeds", async () => {
-    const sleep: (ms: number) => Promise<void> = vi.fn(async () => {});
+    const sleep = vi.fn<(ms: number) => Promise<void>>(async () => {});
     let calls = 0;
     const out = await withRetry(
       async () => {
@@ -60,7 +60,7 @@ describe("sync retry policy (NG-SYNC-03)", () => {
   });
 
   it("stops early on permanent errors and exhausts on persistent throttles", async () => {
-    const sleep: (ms: number) => Promise<void> = vi.fn(async () => {});
+    const sleep = vi.fn<(ms: number) => Promise<void>>(async () => {});
     const perm = await withRetry(
       async () => { throw { name: "AccessDeniedException", message: "no" }; },
       DEFAULT_RETRY_POLICY,
