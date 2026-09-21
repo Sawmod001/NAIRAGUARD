@@ -6,6 +6,8 @@ import { prisma } from "@/lib/prisma/client";
 import { AppError } from "@/lib/errors/app-error";
 import { ErrorCode } from "@/lib/errors/codes";
 import { checkRateLimit, RatePresets } from "@/lib/rate-limit";
+import { saveFxSnapshot } from "@/lib/fx/snapshots";
+import { getDemoDataset } from "@/infrastructure/providers/demo/registry";
 
 /**
  * Connect to Demo — NG-DEMO-06
@@ -37,6 +39,17 @@ export async function connectToDemo(): Promise<
         description: "Workspace is ready. Costs, findings, and estimates share one domain model.",
       },
     });
+    // NG-FX-04: pin the workspace FX rate so every NGN estimate traces to a snapshot row.
+    try {
+      const seed = getDemoDataset("balanced-startup").fx;
+      await saveFxSnapshot({
+        organizationId: org.id,
+        rate: { base: "USD", quote: "NGN", rate: seed.usdNgn, provider: seed.provider, observedAt: seed.observedAt },
+        source: "workspace seed",
+      });
+    } catch (seedError) {
+      console.error("[NG-FX-04] workspace FX seed failed (non-blocking):", seedError);
+    }
     return { ok: true, organizationId: org.id, organizationName: org.name, alreadyConnected: false };
   } catch (e) {
     if (e instanceof AppError) throw e;

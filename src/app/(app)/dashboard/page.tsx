@@ -4,6 +4,7 @@ import { DemoCostProvider } from "@/infrastructure/providers/demo/cost-provider"
 import { DemoOptimizationProvider } from "@/infrastructure/providers/demo/optimization-provider";
 import { normalizeCostResult } from "@/domain/costs/normalize";
 import { displayFxSource, toNairaEquivalent } from "@/domain/fx";
+import { getLatestFxSnapshot } from "@/lib/fx/snapshots";
 import { maskAwsAccountId } from "@/schemas/demo";
 import { aggregateSavings } from "@/domain/finops";
 import { prioritizeRecommendations } from "@/domain/optimizations";
@@ -30,10 +31,16 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   const cost = normalizeCostResult(rawCost);
   const recs = await optProvider.getRecommendations({ organizationId: orgId });
   const prioritized = prioritizeRecommendations(recs);
-  const fx = { rate: dataset.fx.usdNgn, observedAt: dataset.fx.observedAt, source: dataset.fx.provider };
-  const totalNgn = toNairaEquivalent(cost.total, fx);
+  // NG-FX-04: prefer the pinned workspace snapshot so NGN estimates trace to a row;
+  // fall back to the dataset fixture for workspaces connected before seeding.
+  const pinnedFx = membership ? await getLatestFxSnapshot(membership.organizationId).catch(() => null) : null;
+  const fx = pinnedFx
+    ? { rate: pinnedFx.rate, observedAt: pinnedFx.retrievedAt, source: pinnedFx.provider }
+    : { rate: dataset.fx.usdNgn, observedAt: dataset.fx.observedAt, source: dataset.fx.provider };
+  const fxSnapshotId = pinnedFx?.id ?? null;
+  const totalNgn = toNairaEquivalent(cost.total, fx, fxSnapshotId);
   const savingsAgg = aggregateSavings(recs);
-  const savingsNgn = toNairaEquivalent(savingsAgg.totalSavingsUsd, fx);
+  const savingsNgn = toNairaEquivalent(savingsAgg.totalSavingsUsd, fx, fxSnapshotId);
   const topServices = [...cost.services].sort((a, b) => b.amount - a.amount).slice(0, 5);
   const name = session?.user?.name ?? session?.user?.email?.split("@")[0] ?? "there";
   const scenarioQs = scenarioId !== "balanced-startup" ? `?scenario=${scenarioId}` : "";

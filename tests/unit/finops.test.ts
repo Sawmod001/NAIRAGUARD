@@ -18,6 +18,12 @@ describe("finops", () => {
     const eq = toNairaEquivalent(120, { rate: 1550, observedAt: "2026-09-15T00:00:00Z", source: "demo" });
     expect(eq.naira).toBe(186000);
     expect(eq.usd).toBe(120);
+    expect(eq.snapshotId).toBeNull();
+  });
+  it("toNairaEquivalent carries the snapshot id for traceability (NG-FX-04)", () => {
+    const eq = toNairaEquivalent(120, { rate: 1550, observedAt: "2026-09-15T00:00:00Z", source: "demo" }, "snap-1");
+    expect(eq.snapshotId).toBe("snap-1");
+    expect(eq.naira).toBe(186000);
   });
   it("prioritize deterministic", () => {
     const items = [

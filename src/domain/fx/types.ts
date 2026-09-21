@@ -19,5 +19,7 @@ export type NairaEquivalent = {
   rate: number;
   observedAt: string;
   source: string;
+  /** Persisted FxSnapshot row this estimate traces to (NG-FX-04). Null when unpinned. */
+  snapshotId: string | null;
   label: "Estimated Naira equivalent";
 };
