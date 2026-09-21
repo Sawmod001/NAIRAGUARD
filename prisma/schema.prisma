@@ -108,6 +108,7 @@ model Organization {
   awsAccounts    AwsAccount[]
   syncRuns       SyncRun[]
   costSnapshots  CostSnapshot[]
+  optimizationFindings OptimizationFinding[]
 
   @@map("organizations")
 }
@@ -214,6 +215,7 @@ model SyncRun {
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
   snapshots      CostSnapshot[]
+  findings       OptimizationFinding[]
 
   @@index([organizationId, createdAt])
   @@index([organizationId, status])
@@ -256,6 +258,41 @@ model CostBreakdown {
 
   @@index([snapshotId, kind])
   @@map("cost_breakdowns")
+}
+
+// NG-OPT-03: persisted optimization evidence. One row per (workspace, externalId);
+// re-syncs upsert so findings stay current without duplicating. Money is integer
+// cents (NG-201); savings values are provider evidence, never AI-derived.
+model OptimizationFinding {
+  id                           String       @id @default(cuid())
+  organizationId               String
+  organization                 Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  syncRunId                    String?
+  syncRun                      SyncRun?     @relation(fields: [syncRunId], references: [id], onDelete: SetNull)
+  externalId                   String
+  source                       String
+  resourceType                 String
+  resourceId                   String
+  resourceArn                  String?
+  region                       String
+  accountId                    String?
+  actionType                   String
+  currentConfiguration         String?
+  recommendedConfiguration     String?
+  estimatedMonthlyCostCents    Int
+  estimatedMonthlySavingsCents Int
+  savingsPercentage            Float?
+  effort                       String
+  restartRequired              Boolean
+  rollbackPossible             Boolean
+  status                       String       @default("open")
+  observedAt                   DateTime
+  createdAt                    DateTime     @default(now())
+  updatedAt                    DateTime     @updatedAt
+
+  @@unique([organizationId, externalId])
+  @@index([organizationId, estimatedMonthlySavingsCents])
+  @@map("optimization_findings")
 }
 
 model Membership {
