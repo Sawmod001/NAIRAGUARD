@@ -14,9 +14,35 @@ import {
 import { CopyBlock } from "@/components/ui/copy-block";
 import { ConnectForm, DisconnectButton, ValidateButton } from "./connect-form";
 import { getConnectionHealth, type AwsConnectionStatus } from "@/domain/aws/connection";
+import { interpretConnectionStatus, retryBadge } from "@/domain/aws/errors";
 import { listAwsAccounts } from "@/lib/aws/registry";
 
 const FAILURE_STATUSES = ["AUTH_FAILED", "PERMISSION_DENIED", "RATE_LIMITED", "ERROR"];
+
+/** NG-AWS-07: failures explain themselves — cause, retryability, and the fix. */
+function FailurePanel({ status, lastError }: { status: AwsConnectionStatus; lastError: string | null }) {
+  const interpreted = interpretConnectionStatus(status);
+  const badge = retryBadge(status);
+  return (
+    <>
+      <div className="mt-2 flex flex-wrap items-center gap-2 text-sm font-medium">
+        <span className="h-2 w-2 rounded-full bg-red-500" aria-hidden /> {interpreted.headline}
+        {badge ? (
+          <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">{badge}</span>
+        ) : (
+          <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-medium text-amber-800">Fix required before retry</span>
+        )}
+      </div>
+      <div className="mt-1 text-sm leading-6 text-stone-600">{interpreted.detail}</div>
+      {lastError && <div className="mt-1 font-mono text-[11px] leading-5 text-stone-500">{lastError}</div>}
+      <div className="mt-1 text-xs leading-5 text-stone-600">
+        <span className="font-medium text-stone-900">Next:</span> {interpreted.nextStep}
+      </div>
+      <ValidateButton />
+      <ConnectForm />
+    </>
+  );
+}
 
 /** NG-AWS-05: every state explains itself — meaning, next step, last validated. */
 function ConnectionHealthPanel({ status, lastValidatedAt }: { status: AwsConnectionStatus; lastValidatedAt: string | null }) {
@@ -81,12 +107,10 @@ export default async function ConnectionsPage() {
               <DisconnectButton />
             </>
           ) : FAILURE_STATUSES.includes(live.status) ? (
-            <>
-              <div className="mt-2 flex items-center gap-2 text-sm font-medium"><span className="h-2 w-2 rounded-full bg-red-500" aria-hidden /> {live.status.replace(/_/g, " ")}</div>
-              <div className="mt-1 text-sm leading-6 text-stone-600">{live.lastError ?? "The last attempt failed. Check the role and try again with a corrected ARN."}</div>
-              <ValidateButton />
-              <ConnectForm />
-            </>
+            <FailurePanel
+              status={live.status as AwsConnectionStatus}
+              lastError={live.lastError}
+            />
           ) : (
             <>
               <div className="mt-2 flex items-center gap-2 text-sm font-medium"><span className="h-2 w-2 rounded-full bg-emerald-500" aria-hidden /> {live.status.replace(/_/g, " ")}</div>
