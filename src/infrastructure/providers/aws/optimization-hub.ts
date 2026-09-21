@@ -5,8 +5,9 @@ import {
   type Recommendation,
 } from "@aws-sdk/client-cost-optimization-hub";
 import { AppError } from "@/lib/errors/app-error";
-import { ErrorCode } from "@/lib/errors/codes";
-import { isRetryableSyncError, isThrottledError, withRetry } from "@/domain/sync/retry";
+import { withRetry } from "@/domain/sync/retry";
+import { mapRecommendationError, REC_CALL_TIMEOUT_MS } from "./recommendation-errors";
+
 import type {
   NormalizedRecommendation,
   OptimizationProvider,
@@ -26,7 +27,7 @@ import type { AwsTempCredentials } from "./credentials";
  */
 
 const HUB_REGION = "us-east-1";
-const CALL_TIMEOUT_MS = 25_000;
+const CALL_TIMEOUT_MS = REC_CALL_TIMEOUT_MS;
 const PAGE_SIZE = 100;
 
 function mapEffort(raw: string | undefined): RecommendationEffort {
@@ -87,21 +88,7 @@ export function mapHubRecommendations(
 }
 
 function mapHubError(err: unknown): AppError {
-  const name = (err as { name?: string })?.name ?? "";
-  const message = err instanceof Error ? err.message : "";
-  if (/AccessDenied|Unauthorized|Forbidden/i.test(name)) {
-    return new AppError({ code: ErrorCode.AWS_ACCESS_DENIED, message: "Cost Optimization Hub denied access. Attach the read permissions from the setup guide.", cause: err });
-  }
-  if (name === "ValidationException" && /enroll|opt.?in/i.test(message)) {
-    return new AppError({ code: ErrorCode.AWS_FEATURE_NOT_ENABLED, message: "Cost Optimization Hub is not enrolled for this account. Enroll in the AWS console first.", cause: err });
-  }
-  if (isThrottledError(err)) {
-    return new AppError({ code: ErrorCode.PROVIDER_THROTTLED, message: "Cost Optimization Hub throttled the request after retries.", cause: err });
-  }
-  if (isRetryableSyncError(err)) {
-    return new AppError({ code: ErrorCode.PROVIDER_UNAVAILABLE, message: "Cost Optimization Hub is temporarily unavailable.", cause: err });
-  }
-  return new AppError({ code: ErrorCode.PROVIDER_UNAVAILABLE, message: "Cost Optimization Hub returned an unexpected response.", cause: err });
+  return mapRecommendationError(err, "Cost Optimization Hub");
 }
 
 export class AwsOptimizationHubProvider implements OptimizationProvider {
