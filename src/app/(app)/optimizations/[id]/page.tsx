@@ -2,7 +2,9 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma/client";
 import { DemoOptimizationProvider } from "@/infrastructure/providers/demo/optimization-provider";
 import { DemoResourceProvider } from "@/infrastructure/providers/demo/resource-provider";
+import { findingsToRecommendations, getOptimizationFinding } from "@/lib/optimizations/findings";
 import { convertUsdToNgn } from "@/domain/fx";
+import { getLatestFxSnapshot } from "@/lib/fx/snapshots";
 import { getDemoDataset } from "@/infrastructure/providers/demo/registry";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -20,14 +22,23 @@ export default async function RecommendationDetailPage({ params, searchParams }:
 
   const scenarioId = (sp.scenario as string) || "balanced-startup";
   const dataset = getDemoDataset(scenarioId);
-  const optProvider = new DemoOptimizationProvider(scenarioId);
-  const rec = await optProvider.getRecommendationById(id, { organizationId: membership.organizationId });
+  // NG-DASH-09: persisted finding first, provider fallback. Resource evidence
+  // stays provider-driven until resource-level persistence lands.
+  const persistedFinding = await getOptimizationFinding({ organizationId: membership.organizationId, externalId: id }).catch(() => null);
+  let rec;
+  if (persistedFinding) {
+    [rec] = findingsToRecommendations([persistedFinding]);
+  } else {
+    const optProvider = new DemoOptimizationProvider(scenarioId);
+    rec = await optProvider.getRecommendationById(id, { organizationId: membership.organizationId });
+  }
   if (!rec) notFound();
 
   const resourceProvider = new DemoResourceProvider(scenarioId);
   const resource = await resourceProvider.getResource({ organizationId: membership.organizationId, resourceId: rec.resourceId });
 
-  const fxRate = dataset.fx.usdNgn;
+  const pinnedFx = await getLatestFxSnapshot(membership.organizationId).catch(() => null);
+  const fxRate = pinnedFx?.rate ?? dataset.fx.usdNgn;
   const savingsNgn = convertUsdToNgn(rec.estimatedMonthlySavingsUsd, fxRate);
   const costNgn = convertUsdToNgn(rec.estimatedMonthlyCostUsd, fxRate);
 

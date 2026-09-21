@@ -15,7 +15,7 @@ vi.mock("@/lib/prisma/client", () => ({
   },
 }));
 
-import { listOptimizationFindings, saveOptimizationFindings } from "@/lib/optimizations/findings";
+import { findingsToRecommendations, listOptimizationFindings, saveOptimizationFindings } from "@/lib/optimizations/findings";
 import type { NormalizedRecommendation } from "@/infrastructure/providers/optimization-provider";
 
 /** NG-OPT-03: findings persist cent-exact, upsert per run, read back ordered. */
@@ -106,6 +106,39 @@ describe("optimization findings (NG-OPT-03)", () => {
       externalId: "rec-1",
       estimatedMonthlySavingsCents: 11870,
       observedAt: "2026-09-15T00:00:00.000Z",
+    });
+  });
+
+  it("converts findings back to provider-shaped recommendations (NG-DASH-09)", () => {
+    const [rec] = findingsToRecommendations([
+      {
+        id: "f-1",
+        externalId: "rec-1",
+        source: "AWS Compute Optimizer",
+        resourceType: "Ec2Instance",
+        resourceId: "i-0abc",
+        resourceArn: null,
+        region: "eu-west-1",
+        accountId: null,
+        actionType: "Rightsize",
+        currentConfiguration: null,
+        recommendedConfiguration: null,
+        estimatedMonthlyCostCents: 0,
+        estimatedMonthlySavingsCents: 11870,
+        savingsPercentage: null,
+        effort: "Low",
+        restartRequired: true,
+        rollbackPossible: true,
+        status: "open",
+        observedAt: "2026-09-15T00:00:00.000Z",
+      },
+    ]);
+    expect(rec).toMatchObject({
+      externalId: "rec-1",
+      estimatedMonthlySavingsUsd: 118.7,
+      estimatedMonthlyCostUsd: 0,
+      currentConfiguration: "Unknown",
+      recommendedConfiguration: "Unknown",
     });
   });
 

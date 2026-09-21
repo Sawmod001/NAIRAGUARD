@@ -1,6 +1,7 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma/client";
 import { DemoOptimizationProvider } from "@/infrastructure/providers/demo/optimization-provider";
+import { findingsToRecommendations, listOptimizationFindings } from "@/lib/optimizations/findings";
 import { prioritizeRecommendations } from "@/domain/optimizations";
 import { convertUsdToNgn } from "@/domain/fx";
 import { getDemoDataset } from "@/infrastructure/providers/demo/registry";
@@ -20,10 +21,16 @@ export async function OptimizationList({ searchParams }: { searchParams?: { effo
 
   const scenarioId = (searchParams?.scenario as string) || "balanced-startup";
   const dataset = getDemoDataset(scenarioId);
-  const provider = new DemoOptimizationProvider(scenarioId);
+  // NG-DASH-09: persisted findings first (org truth, scenario-independent), provider fallback.
+  const persisted = await listOptimizationFindings({ organizationId: membership.organizationId, limit: 200 }).catch(() => null);
   let recs;
   try {
-    recs = await provider.getRecommendations({ organizationId: membership.organizationId });
+    if (persisted && persisted.length > 0) {
+      recs = findingsToRecommendations(persisted);
+    } else {
+      const provider = new DemoOptimizationProvider(scenarioId);
+      recs = await provider.getRecommendations({ organizationId: membership.organizationId });
+    }
   } catch (e: unknown) {
     return <div className="rounded-xl border border-red-200 bg-red-50 p-5 text-sm text-red-700">{e instanceof Error ? e.message : "Failed"}</div>;
   }

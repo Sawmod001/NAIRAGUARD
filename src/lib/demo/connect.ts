@@ -8,8 +8,10 @@ import { ErrorCode } from "@/lib/errors/codes";
 import { checkRateLimit, RatePresets } from "@/lib/rate-limit";
 import { saveFxSnapshot } from "@/lib/fx/snapshots";
 import { saveCostSnapshot } from "@/lib/costs/snapshots";
+import { saveOptimizationFindings } from "@/lib/optimizations/findings";
 import { normalizeCostResult } from "@/domain/costs/normalize";
 import { DemoCostProvider } from "@/infrastructure/providers/demo/cost-provider";
+import { DemoOptimizationProvider } from "@/infrastructure/providers/demo/optimization-provider";
 import { getDemoDataset } from "@/infrastructure/providers/demo/registry";
 
 /**
@@ -61,6 +63,8 @@ export async function connectToDemo(): Promise<
         periodEnd: end.toISOString(),
         cost: normalized,
       });
+      const seedRecs = await new DemoOptimizationProvider("balanced-startup").getRecommendations({ organizationId: org.id });
+      await saveOptimizationFindings({ organizationId: org.id, items: seedRecs });
     } catch (seedError) {
       console.error("[NG-DASH-07] workspace seed failed (non-blocking):", seedError);
     }

@@ -133,3 +133,41 @@ export async function listOptimizationFindings(input: {
   });
   return rows.map(toDTO);
 }
+
+export async function getOptimizationFinding(input: {
+  organizationId: string;
+  externalId: string;
+}): Promise<OptimizationFindingDTO | null> {
+  const row = await prisma.optimizationFinding.findUnique({
+    where: { organizationId_externalId: { organizationId: input.organizationId, externalId: input.externalId } },
+  });
+  return row ? toDTO(row) : null;
+}
+
+/**
+ * Findings → provider-shaped recommendations — NG-DASH-09.
+ * Cents back to dollars for the NormalizedRecommendation contract; evidence
+ * values pass through untouched so list/detail render identically either way.
+ */
+export function findingsToRecommendations(rows: OptimizationFindingDTO[]): NormalizedRecommendation[] {
+  const dollars = (cents: number) => Math.round(cents) / 100;
+  return rows.map((f) => ({
+    externalId: f.externalId,
+    source: f.source,
+    resourceType: f.resourceType,
+    resourceId: f.resourceId,
+    resourceArn: f.resourceArn,
+    region: f.region,
+    actionType: f.actionType,
+    currentConfiguration: f.currentConfiguration ?? "Unknown",
+    recommendedConfiguration: f.recommendedConfiguration ?? "Unknown",
+    estimatedMonthlyCostUsd: dollars(f.estimatedMonthlyCostCents),
+    estimatedMonthlySavingsUsd: dollars(f.estimatedMonthlySavingsCents),
+    savingsPercentage: f.savingsPercentage,
+    effort: f.effort as NormalizedRecommendation["effort"],
+    restartRequired: f.restartRequired,
+    rollbackPossible: f.rollbackPossible,
+    status: f.status,
+    observedAt: f.observedAt,
+  }));
+}
