@@ -29,6 +29,7 @@ export function Navbar() {
             <a href="#product" onClick={() => setOpen(false)}>Product</a>
             <a href="#how" onClick={() => setOpen(false)}>How it works</a>
             <a href="#tour" onClick={() => setOpen(false)}>Tour</a>
+            <a href="#why" onClick={() => setOpen(false)}>Why NairaGuard</a>
             <a href="/sign-in">Sign in</a>
             <a href="/onboarding" className="rounded-full bg-white px-4 py-2 text-center font-medium text-black">Try Demo</a>
           </nav>
