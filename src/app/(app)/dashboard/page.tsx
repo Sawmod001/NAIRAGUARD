@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma/client";
 import { DemoCostProvider } from "@/infrastructure/providers/demo/cost-provider";
 import { DemoOptimizationProvider } from "@/infrastructure/providers/demo/optimization-provider";
 import { normalizeCostResult } from "@/domain/costs/normalize";
+import { notFound } from "next/navigation";
 import { displayFxSource, toNairaEquivalent } from "@/domain/fx";
 import type { DomainCost } from "@/domain/costs/types";
 import { formatAge } from "@/domain/sync/runs";
@@ -31,6 +32,18 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   const costProvider = new DemoCostProvider(scenarioId);
   const optProvider = new DemoOptimizationProvider(scenarioId);
   const orgId = membership?.organizationId ?? "demo";
+  // NG-ONBOARD-01: demo figures only for workspaces that chose them. Everyone
+  // else gets the empty state until a live connection or Try Demo exists.
+  if (membership) {
+    const [demoActivity, liveConnection] = await Promise.all([
+      prisma.activityEvent.count({ where: { organizationId: membership.organizationId } }),
+      prisma.awsConnection.findFirst({
+        where: { organizationId: membership.organizationId, status: { not: "DISCONNECTED" } },
+        select: { id: true },
+      }),
+    ]);
+    if (demoActivity === 0 && !liveConnection) notFound();
+  }
   // NG-DASH-07: persisted snapshot first (seeded at Connect), provider fallback.
   // Totals follow the visible window in both paths, matching provider semantics.
   const persistedCosts = membership ? await getLatestCostSnapshot(membership.organizationId).catch(() => null) : null;

@@ -9,7 +9,8 @@ import { safeCallbackUrl } from "@/lib/auth/callback";
 export function SignUpForm() {
   const router = useRouter();
   const params = useSearchParams();
-  const callbackUrl = safeCallbackUrl(params.get("callbackUrl"));
+  // NG-ONBOARD-01: plain entry lands on the Connect hub, never demo data.
+  const callbackUrl = safeCallbackUrl(params.get("callbackUrl"), "/onboarding");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

@@ -28,8 +28,15 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const isOnboarding = pathname.includes("/onboarding") || url.includes("/onboarding");
   if (organizationId && !isOnboarding) {
     try {
-      const count = await prisma.activityEvent.count({ where: { organizationId } });
-      if (count === 0) {
+      // NG-ONBOARD-01: live connections count as onboarded, not just demo activity.
+      const [count, liveConnection] = await Promise.all([
+        prisma.activityEvent.count({ where: { organizationId } }),
+        prisma.awsConnection.findFirst({
+          where: { organizationId, status: { not: "DISCONNECTED" } },
+          select: { id: true },
+        }),
+      ]);
+      if (count === 0 && !liveConnection) {
         // Only redirect if user hasn't explicitly dismissed — use cookie check via header
         const cookie = hdrs.get("cookie") ?? "";
         const hasDismissed = cookie.includes("ng_onboarded=1");
