@@ -1,10 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
+import { getReducedMotionSnapshot } from "@/lib/motion/reduced-motion";
 
 export function CountUp({ value, prefix = "", decimals = 0 }: { value: number; prefix?: string; decimals?: number }) {
   const [display, setDisplay] = useState(0);
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    if (getReducedMotionSnapshot(window.matchMedia.bind(window))) {
       setDisplay(value);
       return;
     }

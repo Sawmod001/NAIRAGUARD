@@ -16,13 +16,24 @@ const steps = [
 
 export function HeroNew() {
   const [active, setActive] = useState(0);
+  const [visible, setVisible] = useState(true);
   const rootRef = useRef<HTMLElement>(null);
+  // NG-MOTION-04: pause the rotation while the hero is off-screen (mobile scroll).
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root || typeof IntersectionObserver === "undefined") return;
+    const observer = new IntersectionObserver(([entry]) => setVisible(entry?.isIntersecting ?? true), {
+      threshold: 0,
+    });
+    observer.observe(root);
+    return () => observer.disconnect();
+  }, []);
   useEffect(() => {
     const m = window.matchMedia("(prefers-reduced-motion: reduce)");
-    if (m.matches) return;
+    if (m.matches || !visible) return;
     const id = setInterval(() => setActive((v) => (v + 1) % steps.length), 1400);
     return () => clearInterval(id);
-  }, []);
+  }, [visible]);
 
   // NG-MOTION-02: entrance choreography — kicker, headline, sub, CTAs, panel.
   // Reduced-motion users skip it via the shared snapshot (static first paint).
