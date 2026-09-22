@@ -49,6 +49,15 @@ describe("optimization hub mapping (NG-OPT-01)", () => {
     });
   });
 
+  it("skips negative-cost evidence as malformed (NG-SEC-04)", () => {
+    const mapped = mapHubRecommendations(
+      [item({ recommendationId: "bad-cost", estimatedMonthlyCost: -50, estimatedMonthlySavings: 10 })],
+      query,
+      "2026-09-16T00:00:00.000Z"
+    );
+    expect(mapped).toHaveLength(0);
+  });
+
   it("skips items without id or positive savings instead of inventing them", () => {
     const items = [
       item({ recommendationId: undefined }),

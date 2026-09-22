@@ -53,8 +53,12 @@ export function mapHubRecommendations(
   for (const item of items) {
     const savings = item.estimatedMonthlySavings;
     const resourceId = resourceIdOf(item);
-    // No id or no positive savings → not a credible opportunity. Skip, never fabricate.
+    // No id, no positive savings, or negative cost → not credible evidence.
+    // Skip, never fabricate (NG-SEC-04).
     if (!item.recommendationId || savings === undefined || savings === null || savings <= 0 || !resourceId) {
+      continue;
+    }
+    if (item.estimatedMonthlyCost !== undefined && item.estimatedMonthlyCost !== null && item.estimatedMonthlyCost < 0) {
       continue;
     }
     out.push({

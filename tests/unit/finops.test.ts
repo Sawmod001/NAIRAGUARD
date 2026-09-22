@@ -20,6 +20,12 @@ describe("finops", () => {
     expect(eq.usd).toBe(120);
     expect(eq.snapshotId).toBeNull();
   });
+  it("settles conversions in integer minor units (NG-SEC-04)", () => {
+    const eq = toNairaEquivalent(118.7, { rate: 1550, observedAt: "2026-09-15T00:00:00Z", source: "demo" });
+    expect(eq.usdCents).toBe(11870);
+    expect(eq.nairaKobo).toBe(11870 * 1550);
+    expect(Number.isInteger(eq.nairaKobo)).toBe(true);
+  });
   it("toNairaEquivalent carries the snapshot id for traceability (NG-FX-04)", () => {
     const eq = toNairaEquivalent(120, { rate: 1550, observedAt: "2026-09-15T00:00:00Z", source: "demo" }, "snap-1");
     expect(eq.snapshotId).toBe("snap-1");
