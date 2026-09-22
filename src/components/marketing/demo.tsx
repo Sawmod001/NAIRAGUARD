@@ -7,7 +7,7 @@ export function DemoSection() {
             <div className="font-mono text-xs tracking-[0.2em] text-zinc-500">SEE THE WORKFLOW FIRST</div>
             <h2 className="font-display mt-2 text-3xl font-semibold tracking-tight">See the workflow before you connect an account.</h2>
             <p className="mt-2 text-sm text-zinc-400">Real app flow with AWS-style data — costs, waste, recommendations, Naira, explanation.</p>
-            <div className="mt-6 flex gap-3">
+            <div className="mt-6 flex flex-wrap gap-3">
               <a href="/onboarding" className="rounded-full bg-white px-5 py-3 text-sm font-semibold text-black hover:bg-zinc-100">Try Demo</a>
               <a href="/sign-in" className="rounded-full border border-zinc-700 px-5 py-3 text-sm hover:bg-zinc-900">Sign in</a>
             </div>
