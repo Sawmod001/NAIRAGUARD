@@ -7,7 +7,7 @@ export function Credibility() {
         <div className="mt-8 grid gap-6 md:grid-cols-4">
           <div className="border-l-2 border-black pl-4"><div className="font-semibold text-sm">Provider evidence</div><div className="text-sm text-zinc-600">Findings from Cost Optimization Hub / Compute Optimizer</div></div>
           <div className="border-l-2 border-orange-500 pl-4"><div className="font-semibold text-sm">Deterministic</div><div className="text-sm text-zinc-600">Totals, %, NGN via app logic — not LLM</div></div>
-          <div className="border-l-2 border-zinc-300 pl-4"><div className="font-semibold text-sm">Explainable AI</div><div className="text-sm text-zinc-600">Summarizes evidence, never invents savings</div></div>
+          <div className="border-l-2 border-zinc-300 pl-4"><div className="font-semibold text-sm">Guided next steps</div><div className="text-sm text-zinc-600">Evidence-linked actions, risks, and checks before you act</div></div>
           <div className="border-l-2 border-zinc-800 pl-4"><div className="font-semibold text-sm">Security first</div><div className="text-sm text-zinc-600">Future: IAM Role + STS, no long-lived keys</div></div>
         </div>
       </div>

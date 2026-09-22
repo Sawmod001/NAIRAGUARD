@@ -19,7 +19,7 @@ export function HowItWorks() {
             </div>
           ))}
         </div>
-        <div className="mt-6 rounded-full border border-orange-200 bg-orange-50 px-4 py-2 text-center font-mono text-xs tracking-widest text-orange-800">AI EXPLAINS THE NUMBERS. IT DOES NOT INVENT THEM.</div>
+        <div className="mt-6 rounded-full border border-orange-200 bg-orange-50 px-4 py-2 text-center font-mono text-xs tracking-widest text-orange-800">THE NUMBERS ARE DETERMINISTIC. THE CONTEXT EXPLAINS THEM.</div>
       </div>
     </section>
   );

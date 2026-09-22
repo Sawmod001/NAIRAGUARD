@@ -29,8 +29,8 @@ export function RecommendationShowcase() {
               <div className="mt-2 text-sm">CPU avg 12.4% • 14d lookback • Source Cost Optimization Hub • Freshness 2026-09-15</div>
               <div className="mt-2 text-xs">Effort Low • Restart Yes • Rollback Yes • 41.4%</div>
             </div>
-            <div className="rounded-xl bg-violet-50 p-5">
-              <div className="font-mono text-xs tracking-widest text-violet-700">AI EXPLANATION</div>
+            <div className="rounded-xl border border-zinc-200 bg-white p-5">
+              <div className="font-mono text-xs tracking-widest text-zinc-500">WHAT IT MEANS</div>
               <div className="mt-2 text-sm">Rightsizing reduces over-provisioned capacity. Validate in non-prod — restart required.</div>
             </div>
             <a href="/optimizations/BALANCED-STARTUP-REC-001" className="inline-block rounded-full bg-black px-5 py-2 text-sm font-medium text-white">View recommendation details</a>
