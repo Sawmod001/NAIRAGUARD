@@ -17,6 +17,34 @@ export async function OptimizationList({ searchParams }: { searchParams?: { effo
   const membership = await prisma.membership.findFirst({ where: { userId } });
   if (!membership) return <div>No organization</div>;
 
+  // NG-ONBOARD-01: empty workspace names the choice instead of showing unchosen figures.
+  {
+    const [demoActivity, liveConnection] = await Promise.all([
+      prisma.activityEvent.count({ where: { organizationId: membership.organizationId } }),
+      prisma.awsConnection.findFirst({
+        where: { organizationId: membership.organizationId, status: { not: "DISCONNECTED" } },
+        select: { id: true },
+      }),
+    ]);
+    if (demoActivity === 0 && !liveConnection) {
+      return (
+        <div className="rounded-xl border border-dashed border-stone-300 bg-white p-8 text-center">
+          <div className="font-mono text-xs tracking-widest text-stone-500">OPPORTUNITIES</div>
+          <div className="mt-2 text-sm font-semibold">No workspace data yet.</div>
+          <p className="mx-auto mt-1 max-w-md text-sm text-zinc-600">Connect an AWS account for live findings, or explore with a guided dataset first.</p>
+          <div className="mt-4 flex justify-center gap-2">
+            <Link href="/connections" className="rounded-full bg-zinc-900 px-4 py-1.5 text-sm font-medium text-white hover:bg-black">
+              Connect AWS
+            </Link>
+            <Link href="/onboarding" className="rounded-full border border-stone-200 px-4 py-1.5 text-sm hover:bg-zinc-50">
+              Try Demo
+            </Link>
+          </div>
+        </div>
+      );
+    }
+  }
+
   const scenarioId = (searchParams?.scenario as string) || "balanced-startup";
   // NG-DASH-09: persisted findings first (org truth, scenario-independent), provider fallback.
   const persisted = await listOptimizationFindings({ organizationId: membership.organizationId, limit: 200 }).catch(() => null);

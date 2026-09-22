@@ -20,6 +20,18 @@ export default async function RecommendationDetailPage({ params, searchParams }:
   const membership = await prisma.membership.findFirst({ where: { userId } });
   if (!membership) return <div>No organization</div>;
 
+  // NG-ONBOARD-01: empty workspace renders the opportunity-not-found state.
+  {
+    const [demoActivity, liveConnection] = await Promise.all([
+      prisma.activityEvent.count({ where: { organizationId: membership.organizationId } }),
+      prisma.awsConnection.findFirst({
+        where: { organizationId: membership.organizationId, status: { not: "DISCONNECTED" } },
+        select: { id: true },
+      }),
+    ]);
+    if (demoActivity === 0 && !liveConnection) notFound();
+  }
+
   const scenarioId = (sp.scenario as string) || "balanced-startup";
   const dataset = getDemoDataset(scenarioId);
   // NG-DASH-09: persisted finding first, provider fallback. Resource evidence

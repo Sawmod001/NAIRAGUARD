@@ -1,5 +1,6 @@
 import { DemoResourceProvider } from "@/infrastructure/providers/demo/resource-provider";
 import { DemoOptimizationProvider } from "@/infrastructure/providers/demo/optimization-provider";
+import { notFound } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma/client";
 import Link from "next/link";
@@ -12,6 +13,18 @@ export default async function ResourceDetailPage({ params, searchParams }: { par
   const userId = (session?.user as unknown as { id?: string })?.id;
   const membership = userId ? await prisma.membership.findFirst({ where: { userId } }) : null;
   if (!membership) return <div>Unauthorized</div>;
+
+  // NG-ONBOARD-01: empty workspace renders the costs empty state.
+  {
+    const [demoActivity, liveConnection] = await Promise.all([
+      prisma.activityEvent.count({ where: { organizationId: membership.organizationId } }),
+      prisma.awsConnection.findFirst({
+        where: { organizationId: membership.organizationId, status: { not: "DISCONNECTED" } },
+        select: { id: true },
+      }),
+    ]);
+    if (demoActivity === 0 && !liveConnection) notFound();
+  }
 
   const rp = new DemoResourceProvider(scenarioId);
   const resource = await rp.getResource({ organizationId: membership.organizationId, resourceId: id });

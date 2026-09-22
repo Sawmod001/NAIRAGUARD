@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma/client";
 import { DemoCostProvider } from "@/infrastructure/providers/demo/cost-provider";
@@ -26,6 +27,18 @@ export default async function ServiceDetailPage({ params, searchParams }: { para
   const userId = (session?.user as unknown as { id?: string })?.id;
   const membership = userId ? await prisma.membership.findFirst({ where: { userId } }) : null;
   if (!membership) return <div>Unauthorized</div>;
+
+  // NG-ONBOARD-01: empty workspace renders the costs empty state.
+  {
+    const [demoActivity, liveConnection] = await Promise.all([
+      prisma.activityEvent.count({ where: { organizationId: membership.organizationId } }),
+      prisma.awsConnection.findFirst({
+        where: { organizationId: membership.organizationId, status: { not: "DISCONNECTED" } },
+        select: { id: true },
+      }),
+    ]);
+    if (demoActivity === 0 && !liveConnection) notFound();
+  }
 
   // NG-DASH-08: persisted snapshot first (full window for share math), provider fallback.
   const persistedCosts = await getLatestCostSnapshot(membership.organizationId).catch(() => null);
