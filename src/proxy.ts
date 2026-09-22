@@ -73,9 +73,10 @@ export default auth((req) => {
     return res;
   }
 
-  // Not authenticated → redirect to sign-in with no-store
+  // Not authenticated → redirect to sign-in with no-store.
+  // Preserve path + query so post-login lands where the user was headed.
   const url = new URL("/sign-in", req.nextUrl.origin);
-  url.searchParams.set("callbackUrl", req.nextUrl.pathname);
+  url.searchParams.set("callbackUrl", req.nextUrl.pathname + req.nextUrl.search);
   const redirectRes = NextResponse.redirect(url);
   for (const [k, v] of Object.entries(NO_STORE)) redirectRes.headers.set(k, v);
   return redirectRes;
