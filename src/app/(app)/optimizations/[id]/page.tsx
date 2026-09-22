@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma/client";
 import { DemoOptimizationProvider } from "@/infrastructure/providers/demo/optimization-provider";
 import { DemoResourceProvider } from "@/infrastructure/providers/demo/resource-provider";
 import { findingsToRecommendations, getOptimizationFinding } from "@/lib/optimizations/findings";
-import { convertUsdToNgn } from "@/domain/fx";
+import { displayFxSource, toNairaEquivalent } from "@/domain/fx";
 import { getLatestFxSnapshot } from "@/lib/fx/snapshots";
 import { getDemoDataset } from "@/infrastructure/providers/demo/registry";
 import { notFound } from "next/navigation";
@@ -37,10 +37,13 @@ export default async function RecommendationDetailPage({ params, searchParams }:
   const resourceProvider = new DemoResourceProvider(scenarioId);
   const resource = await resourceProvider.getResource({ organizationId: membership.organizationId, resourceId: rec.resourceId });
 
+  // NG-DASH-10: NGN figures trace to the pinned snapshot, like everywhere else.
   const pinnedFx = await getLatestFxSnapshot(membership.organizationId).catch(() => null);
-  const fxRate = pinnedFx?.rate ?? dataset.fx.usdNgn;
-  const savingsNgn = convertUsdToNgn(rec.estimatedMonthlySavingsUsd, fxRate);
-  const costNgn = convertUsdToNgn(rec.estimatedMonthlyCostUsd, fxRate);
+  const fx = pinnedFx
+    ? { rate: pinnedFx.rate, observedAt: pinnedFx.retrievedAt, source: pinnedFx.provider }
+    : { rate: dataset.fx.usdNgn, observedAt: dataset.fx.observedAt, source: dataset.fx.provider };
+  const savingsNgn = toNairaEquivalent(rec.estimatedMonthlySavingsUsd, fx, pinnedFx?.id ?? null);
+  const costNgn = toNairaEquivalent(rec.estimatedMonthlyCostUsd, fx, pinnedFx?.id ?? null);
 
   const backQs = scenarioId !== "balanced-startup" ? `?scenario=${scenarioId}` : "";
   return (
@@ -68,14 +71,14 @@ export default async function RecommendationDetailPage({ params, searchParams }:
         <div className="rounded-xl border border-zinc-200 bg-white p-5">
           <div className="text-xs uppercase tracking-widest text-zinc-500">Current est. monthly cost</div>
           <div className="mt-2 text-lg font-semibold">${rec.estimatedMonthlyCostUsd.toFixed(2)}</div>
-          <div className="text-xs text-zinc-500">₦{costNgn.toLocaleString()} est.</div>
+          <div className="text-xs text-zinc-500">₦{costNgn.naira.toLocaleString()} est.</div>
           <div className="text-xs text-zinc-500">Recommended ${(rec.estimatedMonthlyCostUsd - rec.estimatedMonthlySavingsUsd).toFixed(2)}/mo</div>
         </div>
         <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-5">
           <div className="text-xs uppercase tracking-widest text-emerald-700">Est. monthly savings</div>
           <div className="mt-2 text-lg font-semibold text-emerald-700">${rec.estimatedMonthlySavingsUsd.toFixed(2)}</div>
-          <div className="text-xs text-emerald-700">₦{savingsNgn.toLocaleString()} estimated • {rec.savingsPercentage ? `${rec.savingsPercentage}%` : "—"}</div>
-          <div className="text-xs text-emerald-700">Based on ₦{fxRate.toLocaleString()}/USD • {dataset.fx.observedAt.slice(0, 10)}</div>
+          <div className="text-xs text-emerald-700">₦{savingsNgn.naira.toLocaleString()} estimated • {rec.savingsPercentage ? `${rec.savingsPercentage}%` : "—"}</div>
+          <div className="text-xs text-emerald-700">Based on ₦{fx.rate.toLocaleString()}/USD • {fx.observedAt.slice(0, 10)} • {displayFxSource(fx.source)}</div>
         </div>
         <div className="rounded-xl border border-zinc-200 bg-white p-5">
           <div className="text-xs uppercase tracking-widest text-zinc-500">Effort & risk</div>
@@ -100,7 +103,7 @@ export default async function RecommendationDetailPage({ params, searchParams }:
       </div>
 
       <EvidenceDisplay rec={rec} resource={resource} />
-      <AIExplanationCard rec={rec} fxRate={fxRate} />
+      <AIExplanationCard rec={rec} fxRate={fx.rate} />
     </div>
   );
 }

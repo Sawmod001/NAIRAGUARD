@@ -3,8 +3,6 @@ import { prisma } from "@/lib/prisma/client";
 import { DemoOptimizationProvider } from "@/infrastructure/providers/demo/optimization-provider";
 import { findingsToRecommendations, listOptimizationFindings } from "@/lib/optimizations/findings";
 import { prioritizeRecommendations } from "@/domain/optimizations";
-import { convertUsdToNgn } from "@/domain/fx";
-import { getDemoDataset } from "@/infrastructure/providers/demo/registry";
 import Link from "next/link";
 
 /**
@@ -20,7 +18,6 @@ export async function OptimizationList({ searchParams }: { searchParams?: { effo
   if (!membership) return <div>No organization</div>;
 
   const scenarioId = (searchParams?.scenario as string) || "balanced-startup";
-  const dataset = getDemoDataset(scenarioId);
   // NG-DASH-09: persisted findings first (org truth, scenario-independent), provider fallback.
   const persisted = await listOptimizationFindings({ organizationId: membership.organizationId, limit: 200 }).catch(() => null);
   let recs;
@@ -56,8 +53,6 @@ export async function OptimizationList({ searchParams }: { searchParams?: { effo
       .sort((a, b) => order[a.effort as keyof typeof order] - order[b.effort as keyof typeof order] || b.estimatedMonthlySavingsUsd - a.estimatedMonthlySavingsUsd)
       .map((r, i) => ({ ...r, nairaGuardScore: prioritizeRecommendations([r])[0]!.nairaGuardScore, rank: i + 1 } as typeof prioritized[0]));
   }
-  const fxRate = dataset.fx.usdNgn;
-
   const scenarioQs = scenarioId !== "balanced-startup" ? `&scenario=${scenarioId}` : "";
   // Production table — dense, sticky header, right-aligned monetary, keyboard accessible; stacked on mobile
   return (
