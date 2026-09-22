@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 const steps = [
   { label: "AWS RESOURCES", sub: "EC2 • RDS • EBS • S3" },
   { label: "CLOUD SPEND", sub: "$1,378.16 • 30d" },
-  { label: "WASTE SIGNAL", sub: "EC2 underutilized" },
+  { label: "NEEDS ATTENTION", sub: "EC2 underutilized" },
   { label: "OPPORTUNITY", sub: "Rightsize m6i.2xlarge → xlarge" },
   { label: "POTENTIAL SAVINGS", sub: "$118.70 / mo" },
   { label: "₦ IMPACT", sub: "₦183,985 est." },
@@ -29,12 +29,12 @@ export function HeroNew() {
           <h1 className="font-display mt-4 text-[clamp(32px,6vw,64px)] font-semibold leading-[0.9] tracking-[-0.04em]">
             <span className="block">See where your</span>
             <span className="block">AWS spend goes.</span>
-            <span className="block text-orange-500">Find the waste.</span>
+            <span className="block text-orange-500">Find what deserves attention.</span>
             <span className="block font-light text-zinc-300">Understand what it</span>
             <span className="block font-light text-zinc-300">means in naira.</span>
           </h1>
           <p className="mt-4 max-w-xl text-[15px] leading-6 text-zinc-400">
-            AWS bills arrive in dollars. Your business plans in naira. NairaGuard connects the two — helping teams see what is driving cloud spend, identify optimization opportunities, and understand their estimated Naira impact.
+            AWS gives you the infrastructure bill. NairaGuard gives the business context around it.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <a href="/onboarding" className="rounded-full bg-white px-5 py-3 text-sm font-semibold text-black hover:bg-zinc-100">Try Demo</a>
