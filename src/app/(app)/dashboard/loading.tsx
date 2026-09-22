@@ -1,6 +1,6 @@
 export default function DashboardLoading() {
   return (
-    <div className="space-y-6 animate-pulse">
+    <div className="space-y-6 animate-pulse" aria-busy="true" aria-label="Loading dashboard">
       <div className="h-7 w-40 rounded bg-[#E7E5E2]" />
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         <div className="h-28 rounded-[8px] border border-[#E7E5E2] bg-white p-5" />
