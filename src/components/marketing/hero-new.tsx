@@ -1,7 +1,9 @@
 "use client";
 // NG-HOME-03 audit: interval respects prefers-reduced-motion, no ScrollTrigger pinned sections (0/1 allowed)
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { gsap } from "@/lib/motion/gsap";
+import { getReducedMotionSnapshot } from "@/lib/motion/reduced-motion";
 
 const steps = [
   { label: "AWS RESOURCES", sub: "EC2 • RDS • EBS • S3" },
@@ -14,6 +16,7 @@ const steps = [
 
 export function HeroNew() {
   const [active, setActive] = useState(0);
+  const rootRef = useRef<HTMLElement>(null);
   useEffect(() => {
     const m = window.matchMedia("(prefers-reduced-motion: reduce)");
     if (m.matches) return;
@@ -21,22 +24,38 @@ export function HeroNew() {
     return () => clearInterval(id);
   }, []);
 
+  // NG-MOTION-02: entrance choreography — kicker, headline, sub, CTAs, panel.
+  // Reduced-motion users skip it via the shared snapshot (static first paint).
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root || getReducedMotionSnapshot(window.matchMedia.bind(window))) return;
+    const mm = gsap.matchMedia();
+    mm.add("(prefers-reduced-motion: no-preference)", () => {
+      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+      tl.from(root.querySelectorAll("[data-hero-step]"), { y: 28, opacity: 0, duration: 0.7, stagger: 0.09 })
+        .from(root.querySelectorAll("[data-hero-panel]"), { y: 24, opacity: 0, duration: 0.8 }, "-=0.4");
+    });
+    return () => {
+      mm.revert();
+    };
+  }, []);
+
   return (
-    <section className="bg-black text-white">
+    <section ref={rootRef} className="bg-black text-white">
       <div className="mx-auto grid max-w-[1280px] gap-8 px-6 py-12 md:grid-cols-[1.15fr_0.85fr] md:py-20">
         <div>
-          <div className="font-mono text-xs tracking-[0.2em] text-zinc-400">AWS FINOPS / BUILT FOR NAIRA-AWARE TEAMS</div>
-          <h1 className="font-display mt-4 text-[clamp(32px,6vw,64px)] font-semibold leading-[0.9] tracking-[-0.04em]">
+          <div data-hero-step className="font-mono text-xs tracking-[0.2em] text-zinc-400">AWS FINOPS / BUILT FOR NAIRA-AWARE TEAMS</div>
+          <h1 data-hero-step className="font-display mt-4 text-[clamp(32px,6vw,64px)] font-semibold leading-[0.9] tracking-[-0.04em]">
             <span className="block">See where your</span>
             <span className="block">AWS spend goes.</span>
             <span className="block text-orange-500">Find what deserves attention.</span>
             <span className="block font-light text-zinc-300">Understand what it</span>
             <span className="block font-light text-zinc-300">means in naira.</span>
           </h1>
-          <p className="mt-4 max-w-xl text-[15px] leading-6 text-zinc-400">
+          <p data-hero-step className="mt-4 max-w-xl text-[15px] leading-6 text-zinc-400">
             AWS gives you the infrastructure bill. NairaGuard gives the business context around it.
           </p>
-          <div className="mt-6 flex flex-wrap gap-3">
+          <div data-hero-step className="mt-6 flex flex-wrap gap-3">
             <a href="/onboarding" className="rounded-full bg-white px-5 py-3 text-sm font-semibold text-black hover:bg-zinc-100">Try Demo</a>
             <a href="#how" className="rounded-full border border-zinc-700 px-5 py-3 text-sm font-medium hover:bg-zinc-900">See how it works</a>
           </div>
@@ -44,7 +63,7 @@ export function HeroNew() {
         </div>
 
         {/* Visual story — product UI + human context, not decorative */}
-        <div className="relative overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900">
+        <div data-hero-panel className="relative overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900">
           {/* Business image — human context, masked transition with story */}
           <div className="relative h-48 overflow-hidden">
             <img
