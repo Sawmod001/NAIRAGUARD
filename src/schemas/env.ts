@@ -31,6 +31,15 @@ const optionalNonEmpty = z
   .optional()
   .transform((v) => (v === "" ? undefined : v));
 
+// Auth.js signs JWTs with this HMAC secret — weak values fail fast instead of
+// silently downgrading session integrity. Empty stays allowed for Demo boot.
+const authSecretSchema = z
+  .string()
+  .trim()
+  .optional()
+  .transform((v) => (v === "" ? undefined : v))
+  .pipe(z.string().min(32, "AUTH_SECRET must be at least 32 characters").optional());
+
 // --- Client (NEXT_PUBLIC_ only) — no auth secrets per docs/10 ---
 export const clientEnvSchema = z.object({
   NEXT_PUBLIC_APP_URL: z
@@ -56,7 +65,7 @@ export const serverEnvSchema = z
     DATABASE_URL: optionalNonEmpty,
 
     // Auth — Auth.js (server-only, no NEXT_PUBLIC_)
-    AUTH_SECRET: optionalNonEmpty,
+    AUTH_SECRET: authSecretSchema,
     AUTH_URL: optionalUrl,
     RESEND_API_KEY: optionalNonEmpty,
     EMAIL_FROM: optionalNonEmpty,
