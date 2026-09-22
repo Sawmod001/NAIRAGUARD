@@ -14,7 +14,6 @@ export function Navbar() {
         <nav aria-label="Primary" className="hidden items-center gap-6 text-sm md:flex">
           <a href="#product" className="text-zinc-300 hover:text-white">Product</a>
           <a href="#how" className="text-zinc-300 hover:text-white">How it works</a>
-          <a href="#tour" className="text-zinc-300 hover:text-white">Tour</a>
           <a href="#why" className="text-zinc-300 hover:text-white">Why NairaGuard</a>
           <a href="/sign-in" className="text-zinc-300 hover:text-white">Sign in</a>
           <a href="/onboarding" className="rounded-full bg-white px-4 py-2 font-medium text-black hover:bg-zinc-100">Try Demo</a>
@@ -28,7 +27,6 @@ export function Navbar() {
           <nav className="flex flex-col gap-3 text-sm">
             <a href="#product" onClick={() => setOpen(false)}>Product</a>
             <a href="#how" onClick={() => setOpen(false)}>How it works</a>
-            <a href="#tour" onClick={() => setOpen(false)}>Tour</a>
             <a href="#why" onClick={() => setOpen(false)}>Why NairaGuard</a>
             <a href="/sign-in">Sign in</a>
             <a href="/onboarding" className="rounded-full bg-white px-4 py-2 text-center font-medium text-black">Try Demo</a>
